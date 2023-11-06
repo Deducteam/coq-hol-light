@@ -1,21 +1,19 @@
-FILE = hol_upto_arith
-
-COQ = coqc
-
 .SUFFIXES:
 
 .PHONY: default
-default: $(FILE)_opam.vo
-%.vo: %.v
-	$(COQ) -R . HOLLight $<
-$(FILE)_opam.vo: coq.vo theory_hol.vo $(FILE)_types.vo $(FILE)_terms.vo $(FILE)_axioms.vo
+default: Makefile.coq
+	$(MAKE) -f Makefile.coq
 
-.PHONY: clean
-clean:
-	rm -f *.vo* *.glob .*.aux .lia.cache .nia.cache Makefile.coq Makefile.coq.conf
-
-Makefile.coq:
+Makefile.coq: _CoqProject
 	coq_makefile -f _CoqProject -o $@
 
-install: Makefile.coq
-	$(MAKE) -f Makefile.coq install
+_CoqProject:
+	echo -R . HOLLight `ls *.v` > $@
+
+.PHONY: clean
+clean: Makefile.coq
+	$(MAKE) -f Makefile.coq $@
+	rm -f _CoqProject Makefile.coq Makefile.coq.conf
+
+%:
+	$(MAKE) -f Makefile.coq $@

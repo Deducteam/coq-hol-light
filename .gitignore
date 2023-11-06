@@ -1,3 +1,4 @@
+_CoqProject
 Makefile.coq
 Makefile.coq.conf
 *.vo*
@@ -5,3 +6,4 @@ Makefile.coq.conf
 .*.aux
 .lia.cache
 .nia.cache
+.Makefile.coq.d

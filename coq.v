@@ -66,7 +66,7 @@ Axiom fun_ext : forall {A B : Type} {f g : A -> B}, (forall x, (f x) = (g x)) ->
 
 Axiom prop_ext : forall {P Q : Prop}, (P -> Q) -> (Q -> P) -> P = Q.
 
-Require Import ClassicalFacts.
+Require Import Coq.Logic.ClassicalFacts.
 
 Lemma prop_degen : forall P, P = True \/ P = False.
 Proof.
@@ -75,7 +75,7 @@ Proof.
   intro P. apply classic.
 Qed.
 
-Require Import PropExtensionalityFacts.
+Require Import Coq.Logic.PropExtensionalityFacts.
 
 Lemma is_True P : (P = True) = P.
 Proof.
@@ -507,7 +507,7 @@ Proof.
   induction y; simpl. rewrite h0. reflexivity. rewrite hs, IHy. reflexivity.
 Qed.
 
-Require Import Lia.
+Require Import Coq.micromega.Lia.
 
 Lemma le_def : le = (@ε (arr (prod nat nat) (arr nat (arr nat Prop'))) (fun le' : (prod nat nat) -> nat -> nat -> Prop => forall _2241 : prod nat nat, (forall m : nat, (le' _2241 m ( 0)) = (m = ( 0))) /\ (forall m : nat, forall n : nat, (le' _2241 m (S n)) = ((m = (S n)) \/ (le' _2241 m n)))) (@pair nat nat ( (BIT0 (BIT0 (BIT1 (BIT1 (BIT1 (BIT1 0))))))) ( (BIT1 (BIT0 (BIT1 (BIT1 (BIT1 (BIT1 0))))))))).
 Proof.
