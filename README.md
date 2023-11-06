@@ -6,7 +6,8 @@ This library contains an automatic translation in [Coq](https://coq.inria.fr/) o
 As HOL-Light is based on higher-order logic, it assumes in Coq classical logic, Hilbert's ε operator, functional and propositional extensionnality (see [coq.v](https://github.com/Deducteam/coq-hol-light/blob/main/coq.v) for more details):
 
 ```
-Require Import Coq.Logic.ClassicalEpsilon.
+Axiom classic : forall P:Prop, P \/ ~ P.
+Axiom constructive_indefinite_description : forall (A : Type) (P : A->Prop), (exists x, P x) -> { x : A | P x }.
 Axiom fun_ext : forall {A B : Type} {f g : A -> B}, (forall x, (f x) = (g x)) -> f = g.
 Axiom prop_ext : forall {P Q : Prop}, (P -> Q) -> (Q -> P) -> P = Q.
 ```
@@ -18,3 +19,17 @@ We can translate to Coq much bigger parts of the HOL-Light library (at least all
 The translated theorems are (for the moment) provided as axioms in order to have fast Require's in Coq because the proofs currently extracted from HOL-Light are very big and not very informative for they are low level (the translation is done at the kernel level, not at the source level). If you are skeptical, you can however generate and check them again by using [hol2dk](https://github.com/Deducteam/hol2dk).
 
 The current library contains 448 lemmas. The corresponding Coq proof files have a size of 49 Mo and take about 4m25s to check. The whole HOL-Light base library `hol.ml` has 2834 theorems. The corresponding Coq proof files have a size of 1.9 Go and take about 6 hours to check (with 64 Go RAM). The full HOL-Light library has 36471 theorems.
+
+**Installation using [opam](https://opam.ocaml.org/)**
+
+```
+opam repo add coq-released https://coq.inria.fr/opam/released
+opam install coq-hol-light
+```
+
+**Usage in a Coq file**
+
+```
+Require Import HOLLight.hol_upto_arith_opam.
+Check thm_DIV_DIV.
+```
