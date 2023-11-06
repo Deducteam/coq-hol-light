@@ -1,2 +1,2 @@
-Require Import coq.
-Require Import theory_hol.
+Require Import HOLLight.coq.
+Require Import HOLLight.theory_hol.

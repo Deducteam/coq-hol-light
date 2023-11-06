@@ -1,8 +1,8 @@
-Require Import coq.
-Require Import theory_hol.
-Require Import hol_upto_arith_types.
-Require Import hol_upto_arith_terms.
-Require Import hol_upto_arith_axioms.
+Require Import HOLLight.coq.
+Require Import HOLLight.theory_hol.
+Require Import HOLLight.hol_upto_arith_types.
+Require Import HOLLight.hol_upto_arith_terms.
+Require Import HOLLight.hol_upto_arith_axioms.
 Axiom thm_T_DEF : True = ((fun p : Prop => p) = (fun p : Prop => p)).
 Axiom thm_AND_DEF : and = (fun p : Prop => fun q : Prop => (fun f : Prop -> Prop -> Prop => f p q) = (fun f : Prop -> Prop -> Prop => f True True)).
 Axiom thm_IMP_DEF : imp = (fun p : Prop => fun q : Prop => (p /\ q) = p).
