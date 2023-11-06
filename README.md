@@ -1,7 +1,7 @@
 HOL-Light library in Coq
 ------------------------
 
-This library contains an automatic translation in [Coq](https://coq.inria.fr/) of (for the moment) some small part the [HOL-Light](https://github.com/jrh13/hol-light) library using [hol2dk](https://github.com/Deducteam/hol2dk).
+This library contains an automatic translation in [Coq](https://coq.inria.fr/) of (for the moment) some small part the [HOL-Light](https://github.com/jrh13/hol-light) library using [hol2dk](https://github.com/Deducteam/hol2dk) and [lambdapi](https://github.com/Deducteam/lambdapi).
 
 As HOL-Light is based on higher-order logic, it assumes in Coq classical logic, Hilbert's ε operator, functional and propositional extensionnality (see [coq.v](https://github.com/Deducteam/coq-hol-light/blob/main/coq.v) for more details):
 
