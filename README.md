@@ -36,7 +36,7 @@ Check thm_DIV_DIV.
 
 **Reproducibility**
 
-install HOL-Light and hol2dk as described in [README.md](https://github.com/Deducteam/hol2dk/blob/main/README.md)
+First, install HOL-Light and hol2dk as described in [README.md](https://github.com/Deducteam/hol2dk/blob/main/README.md). Then, do:
 
 ```
 mkdir reproduce
