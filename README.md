@@ -33,3 +33,44 @@ opam install coq-hol-light
 Require Import HOLLight.hol_upto_arith_opam.
 Check thm_DIV_DIV.
 ```
+
+**Reproducibility**
+
+install HOL-Light and hol2dk as described in [README.md](https://github.com/Deducteam/hol2dk/blob/main/README.md)
+
+```
+mkdir reproduce
+cd reproduce
+git clone https://github.com/jrh13/hol-light.git
+export HOL_LIGHT_DIR=`pwd`/hol-light
+git clone https://github.com/Deducteam/hol2dk.git
+export HOL2DK_DIR=`pwd`/hol2dk
+cd $HOL2DK_DIR
+git checkout 983fc82
+dune build && dune install
+./patch $HOL_LIGHT_DIR
+cd $HOL_LIGHT_DIR
+git checkout 9c07c4f
+make
+cp hol.ml hol_upto_arith.ml
+emacs hol_upto_arith.ml # edit hol_upto_arith.ml by removing every thing after ``loads "arith.ml";;''
+hol2dk dump hol_upto_arith.ml
+hol2dk pos hol_upto_arith
+hol2dk use hol_upto_arith
+cd ..
+mkdir output-hol2dk
+cd output-hol2dk
+ln -s $HOL_LIGHT_DIR/hol_upto_arith.sig
+ln -s $HOL_LIGHT_DIR/hol_upto_arith.prf
+ln -s $HOL_LIGHT_DIR/hol_upto_arith.thm
+ln -s $HOL_LIGHT_DIR/hol_upto_arith.pos
+ln -s $HOL_LIGHT_DIR/hol_upto_arith.use
+ln -s $HOL2DK_DIR/lambdapi.pkg
+ln -s $HOL2DK_DIR/theory_hol.lp
+ln -s $HOL2DK_DIR/_CoqProject
+ln -s $HOL2DK_DIR/coq.v
+hol2dk dg 7 hol_upto_arith
+hol2dk mk-part hol_upto_arith
+ln -s hol_upto_arith.mk Makefile
+make -j7 vo
+```
