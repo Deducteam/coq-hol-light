@@ -57,20 +57,11 @@ emacs hol_upto_arith.ml # edit hol_upto_arith.ml by removing every thing after `
 hol2dk dump hol_upto_arith.ml
 hol2dk pos hol_upto_arith
 hol2dk use hol_upto_arith
-cd ..
-mkdir output-hol2dk
-cd output-hol2dk
-ln -s $HOL_LIGHT_DIR/hol_upto_arith.sig
-ln -s $HOL_LIGHT_DIR/hol_upto_arith.prf
-ln -s $HOL_LIGHT_DIR/hol_upto_arith.thm
-ln -s $HOL_LIGHT_DIR/hol_upto_arith.pos
-ln -s $HOL_LIGHT_DIR/hol_upto_arith.use
 ln -s $HOL2DK_DIR/lambdapi.pkg
 ln -s $HOL2DK_DIR/theory_hol.lp
 ln -s $HOL2DK_DIR/_CoqProject
 ln -s $HOL2DK_DIR/coq.v
 hol2dk dg 7 hol_upto_arith
 hol2dk mk-part hol_upto_arith
-ln -s hol_upto_arith.mk Makefile
-make -j7 vo
+make -j7 -f hol_upto_arith.mk vo
 ```
