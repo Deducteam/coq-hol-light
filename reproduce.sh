@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e # to exit as soon as there is an error
+
 mkdir reproduce
 cd reproduce
 
@@ -19,13 +21,19 @@ git checkout 3d231f3
 make
 hol2dk patch
 
-echo extract hol-light proofs
-#cp hol.ml hol_upto_lists.ml
-#emacs hol_upto_lists.ml # remove every thing after ``loads "lists.ml";;''
-cp ../hol-light.ml .
+echo extract hol-light proofs ...
+cp ../../coq_hol_light.ml .
 hol2dk dump-simp-use coq_hol_light.ml # 39s
 cd ..
 
+echo install lambdapi ...
+git clone https://github.com/Deducteam/lambdapi.git
+cd lambdapi
+git checkout 1bb724cf
+opam install -y .
+cd ..
+
+echo translate HOL-Light proofs to lambdapi and coq ...
 mkdir output
 cd output
 hol2dk link coq_hol_light
@@ -38,6 +46,7 @@ make -j32 vo # 4m
 make opam
 cd ..
 
+echo create opam library ...
 mkdir opam
 cd opam
 ../../create-lib.sh ../output
