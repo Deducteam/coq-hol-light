@@ -31,7 +31,7 @@ opam install coq-hol-light
 **Usage in a Coq file**
 
 ```
-Require Import HOLLight.hol_upto_arith_opam.
+Require Import HOLLight.hol_light.
 Check thm_DIV_DIV.
 ```
 
