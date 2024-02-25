@@ -11,7 +11,7 @@ doc: "https://github.com/Deducteam/coq-hol-light"
 maintainer: "frederic.blanqui@inria.fr"
 authors: ["Frédéric Blanqui"]
 license: "CeCILL-2.1"
-depends: [ "coq" {>= "8.16"} ]
+depends: [ "coq" {>= "8.19"} ]
 build: [make "-j%{jobs}%"]
 install: [make "install"]
 tags: [
