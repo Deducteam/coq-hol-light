@@ -9,7 +9,7 @@ echo install hol2dk ...
 git clone https://github.com/Deducteam/hol2dk.git
 cd hol2dk
 export HOL2DK_DIR=`pwd`
-git checkout 36bf943
+git checkout 3330bf7
 dune build && dune install
 cd ..
 
