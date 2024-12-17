@@ -1,2 +1,3 @@
 - [Frédéric Blanqui](https://blanqui.gitlabpages.inria.fr/)
-- [Anthony Bordg](https://sites.google.com/site/anthonybordg/)
+- [Anthony Bordg](https://sites.google.com/site/anthonybordg/) for the alignment of the types sum, list, option
+- Amal Makni for the alignment of subtypes, quotient types and part of the type of real numbers
