@@ -94,10 +94,11 @@ config_output_dir() {
     echo configure output directory ...
     mkdir -p output
     cd output
-    make $jobs clean-all || true
-    hol2dk config $hollight_file $root_path HOLLight_Real_With_N.mappings ../../With_N.v BinNat Rbase Rdefinitions Rbasic_fun ../../With_N.lp ../../With_N.mk
+    if test -f Makefile; then make $jobs clean-all; fi
+    hol2dk config $hollight_file $root_path HOLLight_Real_With_N.mappings ../../With_N.v Coq.NArith.BinNat Coq.Reals.Rbase Coq.Reals.Rdefinitions Coq.Reals.Rbasic_fun ../../With_N.lp ../../With_N.mk
+    cd ..
 }
-
+    
 translate_proofs() {
     line
     echo translate HOL-Light proofs to lambdapi and coq ...
@@ -124,11 +125,24 @@ create_and_check_opam_library() {
     cd ..
     mkdir -p opam
     cd opam
+    cp ../../Makefile ../../With_N.v ../output/theory_hol.v .
     sed -e "s/${base}_//g" -e "/^Require Import ${root_path}.types.$/d" ../output/${base}_terms.v > terms.v
     sed -e "s/${base}_//g" -e "/^Require Import ${root_path}.types.$/d" -e '/^Require Import ${root_path}.axioms.$/d' -e "/^Axiom thm_HAS_INTEGRAL_TWIZZLE_INTERVAL /d" ../output/${base}_opam.v > theorems.v
-    cp ../../With_N.v ../output/theory_hol.v ../../Makefile .
     make
     cd ..
+}
+
+compare_opam_file() {
+    line
+    echo compare $1 ...
+    diff ../$1 opam/$1
+}
+
+compare_opam_files() {
+    for f in theory_hol.v terms.v theorems.v
+    do
+        compare_opam_file $f
+    done
 }
 
 export HOLLIGHT_DIR=`pwd`/hol-light
@@ -166,3 +180,4 @@ stage 9 config_output_dir
 stage 10 translate_proofs
 stage 11 check_proofs
 stage 12 create_and_check_opam_library
+stage 13 compare_opam_files
