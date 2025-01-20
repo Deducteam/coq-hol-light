@@ -1,4 +1,4 @@
-Require Import HOLLight_Real_With_N.mappings HOLLight.With_N BinNat Rbase Rdefinitions Rbasic_fun.
+Require Import HOLLight_Real_With_N.mappings HOLLight.With_N Coq.NArith.BinNat Coq.Reals.Rbase Coq.Reals.Rdefinitions Coq.Reals.Rbasic_fun.
 Require Import HOLLight.theory_hol.
 Definition _FALSITY_ : Prop := False.
 Lemma _FALSITY__def : _FALSITY_ = False.
