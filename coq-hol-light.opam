@@ -13,7 +13,7 @@ authors: ["Frédéric Blanqui"]
 license: "CeCILL-2.1"
 depends: [
   "coq" {>= "8.19"}
-  "coq-hol-light-real" {>= "1.0"}
+  "coq-hol-light-real-with-N" {>= "1.0"}
   "coq-fourcolor-reals" {>= "1.4.0"}
 ]
 build: [make "-j%{jobs}%"]
@@ -23,6 +23,6 @@ tags: [
   "category:Math/Arith/Misc"
   "category:Math/Arith/Real Numbers"
   "category:Math/Real Numbers"
-  "date:2024-12-17"
+  "date:2025-01-20"
   "logpath:HOLLight"
 ]
