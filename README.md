@@ -16,7 +16,8 @@ The types and functions currently [aligned](https://github.com/Deducteam/coq-hol
 - functions on N: pred, add, mul, pow, le, lt, ge, gt, max, min, sub, div, modulo
 - functions on list: app, rev, map, removelast, In, hd, tl
 - functions on R: Rle, Rplus, Rmult, Rinv, Ropp, Rabs, Rdiv, Rminus, Rge, Rgt, Rlt, Rmax, Rmin, IZR
-Help is welcome to align more functions!
+
+Your help is welcome to align more functions!
 
 As HOL-Light is based on classical higher-order logic with choice, this library uses the following standard set of axioms in Coq:
 
