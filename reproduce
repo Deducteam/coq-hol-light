@@ -4,8 +4,8 @@ set -e # to exit as soon as there is an error
 
 hollight_version=3.0.0 # for dependencies
 hollight_commit=28e4aed
-hol2dk_commit=600c94e
-lambdapi_commit=ccfa0e77
+hol2dk_commit=7eb6a02
+lambdapi_commit=21ee7f3d
 
 opam_version=2.2.1
 dune_version=3.17.1
@@ -56,9 +56,15 @@ install_lambdapi() {
 
 install_coq() {
     line
-    echo install coq and package dependencies ...
+    echo install coq ...
     opam repo add coq-released https://coq.inria.fr/opam/released
     opam install -y coq.$coq_version
+}
+
+install_coq_deps() {
+    line
+    echo install coq dependencies ...
+    opam install -y --deps-only .
 }
 
 install_hol2dk() {
@@ -169,6 +175,7 @@ then
 fi
 
 stage 1 create_opam_switch
+eval `opam env`
 stage 2 install_hol_light_deps
 stage 3 install_lambdapi
 stage 4 install_coq
@@ -178,6 +185,7 @@ stage 7 patch_hol_light
 stage 8 dump_proofs
 stage 9 config_output_dir
 stage 10 translate_proofs
-stage 11 check_proofs
-stage 12 create_and_check_opam_library
-stage 13 compare_opam_files
+stage 11 install_coq_deps
+stage 12 check_proofs
+stage 13 create_and_check_opam_library
+stage 14 compare_opam_files
