@@ -1,7 +1,7 @@
 HOL-Light libraries in Coq
 --------------------------
 
-This Coq library contains an automatic translation in [Coq](https://coq.inria.fr/) of the [HOL-Light](https://github.com/jrh13/hol-light) library [Multivariate/make_complex.ml](https://github.com/jrh13/hol-light/blob/master/Multivariate/make_complex.ml) with various HOL-Light types and functions mapped to the corresponding types and functions of the Coq standard library so that, for instance, a HOL-Light theorem on HOL-Light real numbers is translated into a Coq theorem on Coq real numbers. The provided theorems can therefore be readily reused and combined with other Coq developments based on the Coq standard library.
+This Coq library contains an automatic translation in [Coq](https://coq.inria.fr/) of the [HOL-Light](https://github.com/jrh13/hol-light) library [Multivariate/make_complex.ml](https://github.com/jrh13/hol-light/blob/master/Multivariate/make_complex.ml) with various HOL-Light types and functions [mapped](https://github.com/Deducteam/coq-hol-light/blob/main/With_N.lp) to the corresponding types and functions of the Coq standard library so that, for instance, a HOL-Light theorem on HOL-Light real numbers is translated into a Coq theorem on Coq real numbers. The provided theorems can therefore be readily reused and combined with other Coq developments based on the Coq standard library. More types and functions need to be aligned though.
 
 It contains more than 20,000 theorems on arithmetic, wellfounded relations,
 lists, real numbers, integers, basic set theory, permutations, group
@@ -10,6 +10,13 @@ topology, convex sets and functions, paths, polytopes, Brouwer degree,
 derivatives, Clifford algebra, integration, measure theory, complex
 numbers and analysis, transcendental numbers, real analysis, complex
 line integrals, etc. See HOL-Light files for more details.
+
+The types and functions currently [aligned](https://github.com/Deducteam/coq-hol-light/blob/main/With_N.lp) are:
+- types: unit, prod, list, option, sum, ascii, N, R, Z
+- functions on N: pred, add, mul, pow, le, lt, ge, gt, max, min, sub, div, modulo
+- functions on list: app, rev, map, removelast, In, hd, tl
+- functions on R: Rle, Rplus, Rmult, Rinv, Ropp, Rabs, Rdiv, Rminus, Rge, Rgt, Rlt, Rmax, Rmin, IZR
+Help is welcome to align more functions!
 
 As HOL-Light is based on classical higher-order logic with choice, this library uses the following standard set of axioms in Coq:
 

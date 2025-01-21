@@ -113,7 +113,7 @@ check_proofs() {
     line
     echo check proofs ...
     cd output
-    make $jobs vo
+    make $jobs -k vo
     cd ..
 }
 
