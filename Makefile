@@ -1,3 +1,5 @@
+LIBNAME=HOLLight
+
 .SUFFIXES:
 
 .PHONY: default
@@ -8,7 +10,7 @@ Makefile.coq: _CoqProject
 	coq_makefile -f _CoqProject -o $@
 
 _CoqProject:
-	echo -R . HOLLight `ls *.v` > $@
+	echo "-R . $(LIBNAME) `ls *.v`" > $@
 
 .PHONY: clean
 clean: Makefile.coq
