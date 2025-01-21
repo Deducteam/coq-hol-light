@@ -4,7 +4,7 @@ set -e # to exit as soon as there is an error
 
 hollight_version=3.0.0 # for dependencies
 hollight_commit=28e4aed
-hol2dk_commit=44eb6fd
+hol2dk_commit=600c94e
 lambdapi_commit=ccfa0e77
 
 opam_version=2.2.1
@@ -121,7 +121,7 @@ create_and_check_opam_library() {
     line
     echo create opam library ...
     cd output
-    make sig opam
+    make opam
     cd ..
     mkdir -p opam
     cd opam
