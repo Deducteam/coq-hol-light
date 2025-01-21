@@ -11,7 +11,7 @@ opam_version=2.2.1
 dune_version=3.17.1
 ocaml_version=5.2.1
 camlp5_version=8.03.01
-coq_version=8.20.0
+coq_version=8.20.1
 
 hollight_file=Multivariate/make_complex.ml
 base=`basename $hollight_file .ml`
