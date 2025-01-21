@@ -5,7 +5,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
-Add HOL-Light library Multivariate/make_complex.ml (~20,000 theorems).
+- add HOL-Light library Multivariate/make_complex.ml (~20,000 theorems)
+- rename HOLLight.v into With_N.v
+- use coq-hol-light-real-with-N
 
 ## 2.0.0 (2024-12-17)
 
