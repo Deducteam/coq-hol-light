@@ -25,11 +25,25 @@ Your help is welcome to align more functions!
 
 You can easily contribute by proving more mappings in Coq:
 
-- look in [terms.v](https://github.com/Deducteam/coq-hol-light/blob/main/terms.v) for the definition of a function symbol that you want to replace, e.g. the factorial function FACT on N; note that it is followed by a lemma FACT_DEF stating to what FACT it equal to
+- Look in [terms.v](https://github.com/Deducteam/coq-hol-light/blob/main/terms.v) for the definition of a function symbol that you want to replace, e.g. the factorial function FACT on N; note that it is followed by a lemma FACT_DEF stating what FACT it equal to.
 
-- copy and paste in [With_N.v](https://github.com/Deducteam/coq-hol-light/blob/main/With_N.v) the lemma FACT_DEF, and try to prove it when FACT is replaced by your own function
+- Copy and paste in [With_N.v](https://github.com/Deducteam/coq-hol-light/blob/main/With_N.v) the lemma FACT_DEF, and try to prove it when FACT is replaced by your own function.
 
-- create a [pull request](https://github.com/Deducteam/coq-hol-light/pulls)
+- Create a [pull request](https://github.com/Deducteam/coq-hol-light/pulls)
+
+You can also propose to change the mapping of some type in [With_N.v](https://github.com/Deducteam/coq-hol-light/blob/main/With_N.v). Every HOL-Light type `A` is axiomatized as being isomorphic to the set of elements `x` of some already defined type `B` that satisfies some property `p:B->Prop`. `A` can always be mapped to the Coq type `{x:B|p(x)}` (see [mappings.v](https://github.com/Deducteam/coq-hol-light-real-with-nat/blob/main/mappings.v)) but it is possible to map it to some more convenient type `A'` by defining two functions:
+
+- `mk:B->A'`
+
+- `dest:A'->B`
+
+and proving two lemmas:
+
+- `mk_dest x: mk (dest x) = x`
+
+- `dest_mk x: P x = (dest (mk x) = x)`
+
+showing that `A'` is isomorphic to `{x:B|p(x)}`. One could for instance map the type `Group` defined in [With_N.v](https://github.com/Deducteam/coq-hol-light/blob/main/With_N.v) to a more convenient representation.
 
 **Axioms used**
 
