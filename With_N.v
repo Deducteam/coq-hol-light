@@ -701,8 +701,18 @@ Proof.
   - cbn. intros -> [-> e].
     apply Zdiv.Zdiv_0_r.
   - cbn. intros hnz [h1 [h2 h3]].
-    (* TODO From characterisatin of div *)
-    admit.
+    assert (Z.sgn n * div' m n = m / Z.abs n)%Z as e.
+    { apply Z.div_unique_pos with (rem m n).
+      - split. all: eauto.
+      - rewrite Z.mul_assoc. rewrite Z.abs_sgn.
+        rewrite Z.mul_comm. assumption.
+    }
+    destruct (Z.sgn_spec n) as [[hn hs] | [[<- _] | [hn hs]]]. 2: contradiction.
+    + rewrite hs in e. rewrite Z.abs_eq in e. 2: lia.
+      lia.
+    + rewrite hs in e. rewrite Z.abs_neq' in e. 2: lia.
+      (* Maybe Z.div is wrong after all *)
+      admit.
 Admitted.
 
 Close Scope R_scope.
