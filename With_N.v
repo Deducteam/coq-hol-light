@@ -592,6 +592,119 @@ Proof.
   intro n. unfold int_of_real. rewrite Z_of_N_succ, R_of_N_succ, up_succ. lia.
 Qed.
 
+Lemma int_le_def : 
+  Z.le = (fun _28741 : Z => fun _28742 : Z => Rle (IZR _28741) (IZR _28742)).
+Proof. 
+  apply fun_ext. intro n.
+  apply fun_ext. intro m.
+  apply prop_ext.
+  - apply IZR_le.
+  - apply le_IZR.
+Qed.
+
+Lemma int_lt_def : 
+  Z.lt = (fun _28753 : Z => fun _28754 : Z => Rlt (IZR _28753) (IZR _28754)).
+Proof. 
+  apply fun_ext. intro n.
+  apply fun_ext. intro m.
+  apply prop_ext.
+  - apply IZR_lt.
+  - apply lt_IZR.
+Qed.
+
+Lemma int_abs_def : 
+  Z.abs = (fun _28867 : Z => int_of_real (Rabs (IZR _28867))).
+Proof. 
+  apply fun_ext. intro n.
+  rewrite Rabs_Zabs. rewrite axiom_25.
+  reflexivity.
+Qed.
+
+Lemma int_add_def : 
+  Z.add = 
+  (fun _28803 : Z => fun _28804 : Z => int_of_real (Rplus (IZR _28803) (IZR _28804))).
+Proof. 
+  apply fun_ext. intro n.
+  apply fun_ext. intro m.
+  rewrite <- plus_IZR. rewrite axiom_25.
+  reflexivity.
+Qed.
+
+Lemma int_mul_def : 
+  Z.mul = 
+  (fun _28847 : Z => fun _28848 : Z => int_of_real (Rmult (IZR _28847) (IZR _28848))).
+Proof.
+  apply fun_ext. intro n.
+  apply fun_ext. intro m.
+  rewrite <- mult_IZR. rewrite axiom_25.
+  reflexivity.
+Qed.
+
+Lemma prove_COND (P Q R : Prop) :
+  (P -> Q) ->
+  (~ P -> R) ->
+  COND P Q R.
+Proof.
+  intros hq hr.
+  destruct (prop_degen P) as [-> | ->].
+  - rewrite COND_True. auto.
+  - rewrite COND_False. auto.
+Qed.
+
+Lemma COND_elim (P Q R G : Prop) :
+  COND P Q R ->
+  (P -> Q -> G) ->
+  (~ P -> R -> G) ->
+  G.
+Proof.
+  intros h hq hr.
+  destruct (prop_degen P) as [-> | ->].
+  - rewrite COND_True in h. auto.
+  - rewrite COND_False in h. auto.
+Qed.
+
+Definition Zrem a b :=
+  Z.rem a (Z.abs b).
+
+Lemma div_def : 
+  Z.div = 
+  (@ε ((prod N (prod N N)) -> Z -> Z -> Z) (fun q : (prod N (prod N N)) -> Z -> Z -> Z => forall _29326 : prod N (prod N N), exists r : Z -> Z -> Z, forall m : Z, forall n : Z, @COND Prop (n = (Z_of_N (NUMERAL 0%N))) (((q _29326 m n) = (Z_of_N (NUMERAL 0%N))) /\ ((r m n) = m)) ((Z.le (Z_of_N (NUMERAL 0%N)) (r m n)) /\ ((Z.lt (r m n) (Z.abs n)) /\ (m = (Z.add (Z.mul (q _29326 m n) n) (r m n)))))) (@pair N (prod N N) (NUMERAL (BIT0 (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N N (NUMERAL (BIT1 (BIT0 (BIT0 (BIT1 (BIT0 (BIT1 (BIT1 0%N)))))))) (NUMERAL (BIT0 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 (BIT1 0%N))))))))))).
+Proof. 
+  lazymatch goal with
+  | |- context [ ε ?prop ?args ] => 
+    set (P := prop) ;
+    set (a := args) ; clearbody a
+  end.
+  assert (h : exists p, P p).
+  { exists (fun _ => Z.div). red. intros _. clear.
+    exists Zrem. intros m n.
+    apply prove_COND.
+    - intros ->. cbn. split.
+      + apply Zdiv.Zdiv_0_r.
+      + unfold Zrem. cbn. apply PreOmega.Z.rem_0_r_ext. reflexivity.
+    - cbn. intros neq. unfold Zrem. split. 2: split.
+      + admit. (* Not the right Zrem *)
+      + admit.
+      + admit.
+  }
+  eapply ε_spec in h. red in h. specialize (h a). destruct h as [rem h].
+  unfold reverse_coercion.
+  lazymatch goal with
+  | |- _ = ?f => 
+    set (div' := f) in *
+  end.
+  clearbody div'.
+  apply fun_ext. intro m.
+  apply fun_ext. intro n.
+  specialize (h m n).
+  eapply COND_elim with (1 := h) ; clear.
+  - cbn. intros -> [-> e].
+    apply Zdiv.Zdiv_0_r.
+  - cbn. intros hnz [h1 [h2 h3]].
+    (* TODO From characterisatin of div *)
+    admit.
+Admitted.
+
 Close Scope R_scope.
 
 (*****************************************************************************)
