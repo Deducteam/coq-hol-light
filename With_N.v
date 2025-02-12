@@ -475,6 +475,34 @@ Proof. reflexivity. Qed.
 Lemma R_of_N1 : R_of_N 1 = 1%R.
 Proof. reflexivity. Qed.
 
+Definition Rpow (r : R) n : R :=
+  Rfunctions.powerRZ r (Z.of_N n).
+
+Lemma real_pow_def : 
+  Rpow = 
+  (@ε ((prod N (prod N (prod N (prod N (prod N (prod N (prod N N))))))) -> R -> N -> R) (fun real_pow' : (prod N (prod N (prod N (prod N (prod N (prod N (prod N N))))))) -> R -> N -> R => forall _24085 : prod N (prod N (prod N (prod N (prod N (prod N (prod N N)))))), (forall x : R, (real_pow' _24085 x (NUMERAL 0%N)) = (R_of_N (NUMERAL (BIT1 0%N)))) /\ (forall x : R, forall n : N, (real_pow' _24085 x (N.succ n)) = (Rmult x (real_pow' _24085 x n)))) (@pair N (prod N (prod N (prod N (prod N (prod N (prod N N)))))) (NUMERAL (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N (prod N (prod N (prod N N))))) (NUMERAL (BIT1 (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N (prod N (prod N N)))) (NUMERAL (BIT1 (BIT0 (BIT0 (BIT0 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N (prod N N))) (NUMERAL (BIT0 (BIT0 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N N)) (NUMERAL (BIT1 (BIT1 (BIT1 (BIT1 (BIT1 (BIT0 (BIT1 0%N)))))))) (@pair N (prod N N) (NUMERAL (BIT0 (BIT0 (BIT0 (BIT0 (BIT1 (BIT1 (BIT1 0%N)))))))) (@pair N N (NUMERAL (BIT1 (BIT1 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 0%N)))))))) (NUMERAL (BIT1 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 (BIT1 0%N)))))))))))))))).
+Proof.
+  cbn.
+  align_ε.
+  { cbn. split. 1: reflexivity.
+    intros x n.
+    unfold Rpow. rewrite <- !N_nat_Z.
+    rewrite <- !Rfunctions.pow_powerRZ.
+    rewrite Nnat.N2Nat.inj_succ. reflexivity.
+  }
+  cbn. intros pow' [h0 hS].
+  ext r n.
+  rewrite <- (Nnat.N2Nat.id n).
+  unfold Rpow. rewrite nat_N_Z.
+  generalize (N.to_nat n) as m. clear n. intro n.
+  rewrite <- Rfunctions.pow_powerRZ.
+  induction n as [| n ih].
+  - cbn. rewrite h0. reflexivity.
+  - rewrite Nnat.Nat2N.inj_succ. cbn.
+    rewrite hS. rewrite ih.
+    reflexivity.
+Qed.
+
 (*Fixpoint Rpower_nat r n : R :=
   match n with
   | 0 => 1
