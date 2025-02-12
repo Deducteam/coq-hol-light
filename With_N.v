@@ -708,15 +708,8 @@ Proof.
     cbn. reflexivity.
   - cbn. intros hnz [h1 [h2 h3]].
     assert (Z.sgn n * div' m n = m / Z.abs n)%Z as e.
-    { apply Z.div_unique_pos with (rem m n).
-      - split. all: eauto.
-      - rewrite Z.mul_assoc. rewrite Z.abs_sgn.
-        rewrite Z.mul_comm. assumption.
-    }
-    unfold Zdiv.
-    destruct (Z.sgn_spec n) as [[hn hs] | [[<- _] | [hn hs]]]. 2: contradiction.
-    + rewrite hs in e |- *. lia.
-    + rewrite hs in e |- *. lia.
+    { apply Z.div_unique_pos with (rem m n). all: lia. }
+    unfold Zdiv. lia.
 Qed.
 
 Lemma rem_def : 
