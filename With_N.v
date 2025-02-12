@@ -667,7 +667,7 @@ Definition Zdiv a b :=
   (Z.sgn b * (a / Z.abs b))%Z.
 
 Definition Zrem a b :=
-  Z.rem a (Z.abs b).
+  (a mod Z.abs b)%Z.
 
 Lemma div_def : 
   Zdiv = 
@@ -680,15 +680,18 @@ Proof.
   end.
   assert (h : exists p, P p).
   { exists (fun _ => Zdiv). red. intros _. clear.
-    exists Zrem. intros m n.
+    exists Zrem. unfold Zdiv, Zrem. intros m n.
     apply prove_COND.
     - intros ->. cbn. split.
       + reflexivity.
-      + unfold Zrem. cbn. apply PreOmega.Z.rem_0_r_ext. reflexivity.
-    - unfold Zrem. cbn. intros hnz. split. 2: split.
-      + admit. 
-      + admit.
-      + admit.
+      + apply Zdiv.Zmod_0_r.
+    - cbn. intros hnz. 
+      assert (han : (0 < Z.abs n)%Z).
+      { pose proof (Z.abs_nonneg n). lia. }
+      split. 2: split.
+      + apply Z.mod_pos_bound. assumption.
+      + apply Z.mod_pos_bound. assumption.
+      + pose proof (Z.div_mod m (Z.abs n)). lia.
   }
   eapply ε_spec in h. red in h. specialize (h a). destruct h as [rem h].
   unfold reverse_coercion.
@@ -714,7 +717,7 @@ Proof.
     destruct (Z.sgn_spec n) as [[hn hs] | [[<- _] | [hn hs]]]. 2: contradiction.
     + rewrite hs in e |- *. lia.
     + rewrite hs in e |- *. lia.
-Admitted.
+Qed.
 
 Close Scope R_scope.
 
