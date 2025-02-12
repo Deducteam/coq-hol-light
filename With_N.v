@@ -665,6 +665,52 @@ Proof.
   intro n. unfold int_of_real. rewrite Z_of_N_succ, R_of_N_succ, up_succ. lia.
 Qed.
 
+Definition Rsgn r :=
+  r / Rabs r.
+
+Lemma Rsgn_0 :
+  Rsgn 0 = 0.
+Proof.
+  unfold Rsgn. lra.
+Qed.
+
+Lemma Rsgn_pos r :
+  r > 0 ->
+  Rsgn r = 1.
+Proof.
+  intro h.
+  unfold Rsgn.
+  rewrite Rabs_pos_eq. 2: lra.
+  rewrite Rdiv_diag. 2: lra.
+  reflexivity.
+Qed.
+
+Lemma Rsgn_neg r :
+  r < 0 ->
+  Rsgn r = -1.
+Proof.
+  intro h.
+  unfold Rsgn.
+  rewrite Rabs_left. 2: assumption.
+  rewrite Rdiv_opp_r.
+  rewrite Rdiv_diag. 2: lra.
+  reflexivity.
+Qed.
+
+Lemma real_sgn_def : 
+  Rsgn = 
+  (fun _26598 : R => @COND R (Rlt (R_of_N (NUMERAL 0%N)) _26598) (R_of_N (NUMERAL (BIT1 0%N))) (@COND R (Rlt _26598 (R_of_N (NUMERAL 0%N))) (Ropp (R_of_N (NUMERAL (BIT1 0%N)))) (R_of_N (NUMERAL 0%N)))).
+Proof. 
+  unfold Rsgn.
+  ext r. cbn.
+  rewrite thm_COND_ELIM_THM. split.
+  - apply Rsgn_pos.
+  - intro h. rewrite thm_COND_ELIM_THM. split.
+    + apply Rsgn_neg.
+    + intro h'. assert (r = 0) as -> by lra.
+      lra.
+Qed.
+
 Lemma int_le_def : 
   Z.le = (fun _28741 : Z => fun _28742 : Z => Rle (IZR _28741) (IZR _28742)).
 Proof. 
@@ -691,6 +737,20 @@ Proof.
   apply fun_ext. intro n.
   rewrite Rabs_Zabs. rewrite axiom_25.
   reflexivity.
+Qed.
+
+Lemma int_sgn_def : 
+  Z.sgn = (fun _28878 : Z => int_of_real (Rsgn (IZR _28878))).
+Proof.
+  ext z.
+  destruct z. all: cbn.
+  - rewrite Rsgn_0. rewrite axiom_25. reflexivity.
+  - rewrite Rsgn_pos.
+    2:{ apply IZR_lt. lia. }
+    rewrite axiom_25. reflexivity.
+  - rewrite Rsgn_neg.
+    2:{ apply IZR_lt. lia. }
+    rewrite axiom_25. reflexivity.
 Qed.
 
 Lemma int_add_def : 
