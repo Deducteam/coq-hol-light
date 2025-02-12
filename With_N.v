@@ -680,17 +680,6 @@ Proof.
   exists a. apply ha.
 Qed.
 
-Ltac align_ε :=
-  let rec aux :=
-    lazymatch goal with 
-    | |- _ = ε _ => idtac
-    | |- _ ?x = ε _ ?x => apply (f_equal (fun f => f x)) ; aux
-    | |- ?f = ε _ ?r => apply (f_equal (fun g => g r) (x := fun _ => f)) ; aux
-    end
-  in
-  aux ;
-  apply align_ε.
-
 Tactic Notation "ext" ident(x) :=
   apply fun_ext ; intro x.
 
@@ -706,13 +695,32 @@ Ltac gobble f x :=
   clearbody g ; clear f x ;
   rename g into f.
 
+Ltac align_ε :=
+  let rec aux :=
+    lazymatch goal with 
+    | |- _ = ε _ => apply align_ε
+    | |- _ ?x = ε _ ?x => apply (f_equal (fun f => f x)) ; aux
+    | |- ?f = ε _ ?r => 
+      apply (f_equal (fun g => g r) (x := fun _ => f)) ; 
+      aux ; [
+        intros _
+      | let g := fresh f in
+        let na := fresh in
+        let h := fresh in
+        intros g h ;
+        ext na ; specialize (h na) ; gobble g na ;
+        revert g h
+      ]
+    end
+  in
+  aux.
+
 Lemma div_def : 
   Zdiv = 
   (@ε ((prod N (prod N N)) -> Z -> Z -> Z) (fun q : (prod N (prod N N)) -> Z -> Z -> Z => forall _29326 : prod N (prod N N), exists r : Z -> Z -> Z, forall m : Z, forall n : Z, @COND Prop (n = (Z_of_N (NUMERAL 0%N))) (((q _29326 m n) = (Z_of_N (NUMERAL 0%N))) /\ ((r m n) = m)) ((Z.le (Z_of_N (NUMERAL 0%N)) (r m n)) /\ ((Z.lt (r m n) (Z.abs n)) /\ (m = (Z.add (Z.mul (q _29326 m n) n) (r m n)))))) (@pair N (prod N N) (NUMERAL (BIT0 (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N N (NUMERAL (BIT1 (BIT0 (BIT0 (BIT1 (BIT0 (BIT1 (BIT1 0%N)))))))) (NUMERAL (BIT0 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 (BIT1 0%N))))))))))).
 Proof.
   align_ε.
-  { intros _.
-    exists Zrem. unfold Zdiv, Zrem. cbn. intros m n.
+  { exists Zrem. unfold Zdiv, Zrem. cbn. intros m n.
     apply prove_COND.
     - intros ->. cbn. split.
       + reflexivity.
@@ -725,9 +733,7 @@ Proof.
       + apply Z.mod_pos_bound. assumption.
       + pose proof (Z.div_mod m (Z.abs n)). lia.
   }
-  cbn. intros div' h.
-  ext foo. specialize (h foo). gobble div' foo.
-  destruct h as [rem h].
+  cbn. intros div' [rem h].
   ext m n. specialize (h m n).
   eapply COND_elim with (1 := h) ; clear.
   - unfold Zdiv. intros -> [-> e].
@@ -743,8 +749,7 @@ Lemma rem_def :
   (@ε ((prod N (prod N N)) -> Z -> Z -> Z) (fun r : (prod N (prod N N)) -> Z -> Z -> Z => forall _29327 : prod N (prod N N), forall m : Z, forall n : Z, @COND Prop (n = (Z_of_N (NUMERAL 0%N))) (((Zdiv m n) = (Z_of_N (NUMERAL 0%N))) /\ ((r _29327 m n) = m)) ((Z.le (Z_of_N (NUMERAL 0%N)) (r _29327 m n)) /\ ((Z.lt (r _29327 m n) (Z.abs n)) /\ (m = (Z.add (Z.mul (Zdiv m n) n) (r _29327 m n)))))) (@pair N (prod N N) (NUMERAL (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 (BIT1 0%N)))))))) (@pair N N (NUMERAL (BIT1 (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 0%N)))))))) (NUMERAL (BIT1 (BIT0 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 0%N))))))))))).
 Proof.
   align_ε.
-  { intros _.
-    unfold Zdiv, Zrem. intros m n.
+  { unfold Zdiv, Zrem. intros m n.
     apply prove_COND.
     - intros ->. cbn. split.
       + reflexivity.
@@ -758,7 +763,6 @@ Proof.
       + pose proof (Z.div_mod m (Z.abs n)). lia.
   }
   cbn. intros rem' h.
-  ext foo. specialize (h foo). gobble rem' foo.
   ext m n. specialize (h m n).
   eapply COND_elim with (1 := h) ; clear.
   - unfold Zdiv, Zrem. intros -> [e ->].
