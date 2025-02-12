@@ -4,6 +4,79 @@
 
 Require Import HOLLight_Real_With_N.mappings Coq.Reals.Rbase Coq.Reals.Rdefinitions Coq.Reals.Rbasic_fun.
 
+(** Utility lemmas **)
+
+Lemma prove_COND (P Q R : Prop) :
+  (P -> Q) ->
+  (~ P -> R) ->
+  COND P Q R.
+Proof.
+  intros hq hr.
+  destruct (prop_degen P) as [-> | ->].
+  - rewrite COND_True. auto.
+  - rewrite COND_False. auto.
+Qed.
+
+Lemma COND_elim (P Q R G : Prop) :
+  COND P Q R ->
+  (P -> Q -> G) ->
+  (~ P -> R -> G) ->
+  G.
+Proof.
+  intros h hq hr.
+  destruct (prop_degen P) as [-> | ->].
+  - rewrite COND_True in h. auto.
+  - rewrite COND_False in h. auto.
+Qed.
+
+Lemma align_ε (A : Type') (P : A -> Prop) a :
+  P a ->
+  (forall x, P x -> a = x) ->
+  a = ε P.
+Proof.
+  intros ha hg.
+  apply hg. 
+  apply ε_spec.
+  exists a. apply ha.
+Qed.
+
+Tactic Notation "ext" ident(x) :=
+  apply fun_ext ; intro x.
+
+Tactic Notation "ext" ident(x) ident(y) :=
+  ext x ; ext y.
+
+Tactic Notation "ext" ident(x) ident(y) ident(z) :=
+  ext x ; ext y ; ext z.
+
+Ltac gobble f x :=
+  let g := fresh in
+  set (g := f x) in * ;
+  clearbody g ; clear f x ;
+  rename g into f.
+
+Ltac align_ε :=
+  let rec aux :=
+    lazymatch goal with 
+    | |- _ = ε _ => apply align_ε
+    | |- _ ?x = ε _ ?x => apply (f_equal (fun f => f x)) ; aux
+    | |- ?f = ε _ ?r => 
+      apply (f_equal (fun g => g r) (x := fun _ => f)) ; 
+      aux ; [
+        intros _
+      | let g := fresh f in
+        let na := fresh in
+        let h := fresh in
+        intros g h ;
+        ext na ; specialize (h na) ; gobble g na ;
+        revert g h
+      ]
+    end
+  in
+  aux.
+
+(** End utility **)
+
 Open Scope R_scope.
 
 Definition R' := {| type := R; el := 0%R |}.
@@ -640,80 +713,11 @@ Proof.
   reflexivity.
 Qed.
 
-Lemma prove_COND (P Q R : Prop) :
-  (P -> Q) ->
-  (~ P -> R) ->
-  COND P Q R.
-Proof.
-  intros hq hr.
-  destruct (prop_degen P) as [-> | ->].
-  - rewrite COND_True. auto.
-  - rewrite COND_False. auto.
-Qed.
-
-Lemma COND_elim (P Q R G : Prop) :
-  COND P Q R ->
-  (P -> Q -> G) ->
-  (~ P -> R -> G) ->
-  G.
-Proof.
-  intros h hq hr.
-  destruct (prop_degen P) as [-> | ->].
-  - rewrite COND_True in h. auto.
-  - rewrite COND_False in h. auto.
-Qed.
-
 Definition Zdiv a b :=
   (Z.sgn b * (a / Z.abs b))%Z.
 
 Definition Zrem a b :=
   (a mod Z.abs b)%Z.
-
-Lemma align_ε (A : Type') (P : A -> Prop) a :
-  P a ->
-  (forall x, P x -> a = x) ->
-  a = ε P.
-Proof.
-  intros ha hg.
-  apply hg. 
-  apply ε_spec.
-  exists a. apply ha.
-Qed.
-
-Tactic Notation "ext" ident(x) :=
-  apply fun_ext ; intro x.
-
-Tactic Notation "ext" ident(x) ident(y) :=
-  ext x ; ext y.
-
-Tactic Notation "ext" ident(x) ident(y) ident(z) :=
-  ext x ; ext y ; ext z.
-
-Ltac gobble f x :=
-  let g := fresh in
-  set (g := f x) in * ;
-  clearbody g ; clear f x ;
-  rename g into f.
-
-Ltac align_ε :=
-  let rec aux :=
-    lazymatch goal with 
-    | |- _ = ε _ => apply align_ε
-    | |- _ ?x = ε _ ?x => apply (f_equal (fun f => f x)) ; aux
-    | |- ?f = ε _ ?r => 
-      apply (f_equal (fun g => g r) (x := fun _ => f)) ; 
-      aux ; [
-        intros _
-      | let g := fresh f in
-        let na := fresh in
-        let h := fresh in
-        intros g h ;
-        ext na ; specialize (h na) ; gobble g na ;
-        revert g h
-      ]
-    end
-  in
-  aux.
 
 Lemma div_def : 
   Zdiv = 
