@@ -663,11 +663,14 @@ Proof.
   - rewrite COND_False in h. auto.
 Qed.
 
+Definition Zdiv a b :=
+  (Z.sgn b * (a / Z.abs b))%Z.
+
 Definition Zrem a b :=
   Z.rem a (Z.abs b).
 
 Lemma div_def : 
-  Z.div = 
+  Zdiv = 
   (@ε ((prod N (prod N N)) -> Z -> Z -> Z) (fun q : (prod N (prod N N)) -> Z -> Z -> Z => forall _29326 : prod N (prod N N), exists r : Z -> Z -> Z, forall m : Z, forall n : Z, @COND Prop (n = (Z_of_N (NUMERAL 0%N))) (((q _29326 m n) = (Z_of_N (NUMERAL 0%N))) /\ ((r m n) = m)) ((Z.le (Z_of_N (NUMERAL 0%N)) (r m n)) /\ ((Z.lt (r m n) (Z.abs n)) /\ (m = (Z.add (Z.mul (q _29326 m n) n) (r m n)))))) (@pair N (prod N N) (NUMERAL (BIT0 (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N N (NUMERAL (BIT1 (BIT0 (BIT0 (BIT1 (BIT0 (BIT1 (BIT1 0%N)))))))) (NUMERAL (BIT0 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 (BIT1 0%N))))))))))).
 Proof. 
   lazymatch goal with
@@ -676,14 +679,14 @@ Proof.
     set (a := args) ; clearbody a
   end.
   assert (h : exists p, P p).
-  { exists (fun _ => Z.div). red. intros _. clear.
+  { exists (fun _ => Zdiv). red. intros _. clear.
     exists Zrem. intros m n.
     apply prove_COND.
     - intros ->. cbn. split.
-      + apply Zdiv.Zdiv_0_r.
+      + reflexivity.
       + unfold Zrem. cbn. apply PreOmega.Z.rem_0_r_ext. reflexivity.
-    - cbn. intros neq. unfold Zrem. split. 2: split.
-      + admit. (* Not the right Zrem *)
+    - unfold Zrem. cbn. intros hnz. split. 2: split.
+      + admit. 
       + admit.
       + admit.
   }
@@ -698,8 +701,8 @@ Proof.
   apply fun_ext. intro n.
   specialize (h m n).
   eapply COND_elim with (1 := h) ; clear.
-  - cbn. intros -> [-> e].
-    apply Zdiv.Zdiv_0_r.
+  - unfold Zdiv. cbn. intros -> [-> e].
+    cbn. reflexivity.
   - cbn. intros hnz [h1 [h2 h3]].
     assert (Z.sgn n * div' m n = m / Z.abs n)%Z as e.
     { apply Z.div_unique_pos with (rem m n).
@@ -707,12 +710,10 @@ Proof.
       - rewrite Z.mul_assoc. rewrite Z.abs_sgn.
         rewrite Z.mul_comm. assumption.
     }
+    unfold Zdiv.
     destruct (Z.sgn_spec n) as [[hn hs] | [[<- _] | [hn hs]]]. 2: contradiction.
-    + rewrite hs in e. rewrite Z.abs_eq in e. 2: lia.
-      lia.
-    + rewrite hs in e. rewrite Z.abs_neq' in e. 2: lia.
-      (* Maybe Z.div is wrong after all *)
-      admit.
+    + rewrite hs in e |- *. lia.
+    + rewrite hs in e |- *. lia.
 Admitted.
 
 Close Scope R_scope.
