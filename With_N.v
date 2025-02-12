@@ -719,6 +719,49 @@ Proof.
     + rewrite hs in e |- *. lia.
 Qed.
 
+Lemma rem_def : 
+  Zrem = 
+  (@ε ((prod N (prod N N)) -> Z -> Z -> Z) (fun r : (prod N (prod N N)) -> Z -> Z -> Z => forall _29327 : prod N (prod N N), forall m : Z, forall n : Z, @COND Prop (n = (Z_of_N (NUMERAL 0%N))) (((Zdiv m n) = (Z_of_N (NUMERAL 0%N))) /\ ((r _29327 m n) = m)) ((Z.le (Z_of_N (NUMERAL 0%N)) (r _29327 m n)) /\ ((Z.lt (r _29327 m n) (Z.abs n)) /\ (m = (Z.add (Z.mul (Zdiv m n) n) (r _29327 m n)))))) (@pair N (prod N N) (NUMERAL (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 (BIT1 0%N)))))))) (@pair N N (NUMERAL (BIT1 (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 0%N)))))))) (NUMERAL (BIT1 (BIT0 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 0%N))))))))))).
+Proof.
+  lazymatch goal with
+  | |- context [ ε ?prop ?args ] => 
+    set (P := prop) ;
+    set (a := args) ; clearbody a
+  end.
+  assert (h : exists p, P p).
+  { exists (fun _ => Zrem). red. intros _. clear.
+    unfold Zdiv, Zrem. intros m n.
+    apply prove_COND.
+    - intros ->. cbn. split.
+      + reflexivity.
+      + apply Zdiv.Zmod_0_r.
+    - cbn. intros hnz. 
+      assert (han : (0 < Z.abs n)%Z).
+      { pose proof (Z.abs_nonneg n). lia. }
+      split. 2: split.
+      + apply Z.mod_pos_bound. assumption.
+      + apply Z.mod_pos_bound. assumption.
+      + pose proof (Z.div_mod m (Z.abs n)). lia.
+  }
+  eapply ε_spec in h. red in h. specialize (h a).
+  unfold reverse_coercion.
+  lazymatch goal with
+  | |- _ = ?f => 
+    set (rem' := f) in *
+  end.
+  clearbody rem'.
+  apply fun_ext. intro m.
+  apply fun_ext. intro n.
+  specialize (h m n).
+  eapply COND_elim with (1 := h) ; clear.
+  - unfold Zdiv, Zrem. cbn. intros -> [e ->].
+    cbn. apply Zdiv.Zmod_0_r.
+  - unfold Zdiv, Zrem. cbn. intros hnz [h1 [h2 h3]].
+    pose proof (Z.div_mod m (Z.abs n)) as e. 
+    rewrite <- Z.sgn_abs in e at 1.
+    lia.
+Qed.
+
 Close Scope R_scope.
 
 (*****************************************************************************)
