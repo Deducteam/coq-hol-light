@@ -814,11 +814,12 @@ Proof.
   unfold Zpow, Rpow. 
   rewrite nat_N_Z.
   rewrite <- Rfunctions.pow_powerRZ.
+  rewrite <- axiom_25 at 1. f_equal.
   induction m as [| m ih].
-  - cbn. rewrite axiom_25. reflexivity.
+  - cbn. reflexivity.
   - rewrite Nat2Z.inj_succ. rewrite Z.pow_succ_r. 2: lia.
-    rewrite ih. cbn.
-Admitted.
+    rewrite mult_IZR. rewrite ih. reflexivity.
+Qed.
 
 Definition Zdiv a b :=
   (Z.sgn b * (a / Z.abs b))%Z.
