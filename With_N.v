@@ -970,6 +970,15 @@ Proof.
     exists k. assumption.
 Qed.
 
+Lemma int_divides_def : 
+  Z.divide = 
+  (fun _29644 : Z => fun _29645 : Z => exists x : Z, _29645 = (Z.mul _29644 x)).
+Proof.
+  ext a b. apply prop_ext.
+  - apply PreOmega.Z.divide_alt.
+  - intros [c e]. eapply Znumtheory.Zdivide_intro with c. lia.
+Qed.
+
 Close Scope R_scope.
 
 (*****************************************************************************)
