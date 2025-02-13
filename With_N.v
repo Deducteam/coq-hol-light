@@ -739,6 +739,13 @@ Proof.
       lra.
 Qed.
 
+Lemma integer_def : 
+  integer = 
+  (fun _28715 : R => exists n : N, (Rabs _28715) = (R_of_N n)).
+Proof.
+  reflexivity.
+Qed.
+
 Lemma int_le_def : 
   Z.le = (fun _28741 : Z => fun _28742 : Z => Rle (IZR _28741) (IZR _28742)).
 Proof. 
