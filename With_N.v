@@ -801,6 +801,18 @@ Proof.
   reflexivity.
 Qed.
 
+Lemma int_min_def : 
+  Z.min = 
+  (fun _28956 : Z => fun _28957 : Z => int_of_real (Rmin (IZR _28956) (IZR _28957))).
+Proof.
+  ext n m.
+  eapply Rmin_case_strong. all: intro h. all: apply le_IZR in h.
+  - rewrite Z.min_l. 2: lia.
+    rewrite axiom_25. reflexivity.
+  - rewrite Z.min_r. 2: lia.
+    rewrite axiom_25. reflexivity.
+Qed.
+
 Definition Zpow n m :=
   (n ^ Z.of_N m)%Z.
 
