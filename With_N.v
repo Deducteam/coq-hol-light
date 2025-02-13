@@ -1007,11 +1007,14 @@ Proof.
   cbn. reflexivity.
 Qed.
 
+Definition int_gcd '(a,b) :=
+  Z.gcd a b.
+
 Lemma int_gcd_def : 
-  (fun '(a,b) => Z.gcd a b) = 
+  int_gcd = 
   (@ε ((prod N (prod N (prod N (prod N (prod N (prod N N)))))) -> (prod Z Z) -> Z) (fun d : (prod N (prod N (prod N (prod N (prod N (prod N N)))))) -> (prod Z Z) -> Z => forall _30960 : prod N (prod N (prod N (prod N (prod N (prod N N))))), forall a : Z, forall b : Z, (Z.le (Z_of_N (NUMERAL 0%N)) (d _30960 (@pair Z Z a b))) /\ ((Z.divide (d _30960 (@pair Z Z a b)) a) /\ ((Z.divide (d _30960 (@pair Z Z a b)) b) /\ (exists x : Z, exists y : Z, (d _30960 (@pair Z Z a b)) = (Z.add (Z.mul a x) (Z.mul b y)))))) (@pair N (prod N (prod N (prod N (prod N (prod N N))))) (NUMERAL (BIT1 (BIT0 (BIT0 (BIT1 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N (prod N (prod N N)))) (NUMERAL (BIT0 (BIT1 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N (prod N N))) (NUMERAL (BIT0 (BIT0 (BIT1 (BIT0 (BIT1 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N N)) (NUMERAL (BIT1 (BIT1 (BIT1 (BIT1 (BIT1 (BIT0 (BIT1 0%N)))))))) (@pair N (prod N N) (NUMERAL (BIT1 (BIT1 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N N (NUMERAL (BIT1 (BIT1 (BIT0 (BIT0 (BIT0 (BIT1 (BIT1 0%N)))))))) (NUMERAL (BIT0 (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 0%N))))))))))))))).
 Proof.
-  cbn.
+  unfold int_gcd. cbn.
   align_ε.
   - intros a b. split. 2: split. 3: split.
     + apply Z.gcd_nonneg.
@@ -1028,6 +1031,40 @@ Proof.
     + apply Z.divide_mul_l. assumption.
     + apply Z.divide_mul_l. assumption.
 Qed.
+
+Definition int_lcm '(a,b) :=
+  Z.lcm a b.
+
+Lemma int_lcm_def : 
+  int_lcm = 
+  (fun _30961 : prod Z Z => @COND Z ((Z.mul (@fst Z Z _30961) (@snd Z Z _30961)) = (Z_of_N (NUMERAL 0%N))) (Z_of_N (NUMERAL 0%N)) (Z.div (Z.abs (Z.mul (@fst Z Z _30961) (@snd Z Z _30961))) (int_gcd (@pair Z Z (@fst Z Z _30961) (@snd Z Z _30961))))).
+Proof.
+  unfold int_lcm, int_gcd. cbn.
+  ext p. destruct p as [a b]. cbn.
+  rewrite thm_COND_ELIM_THM. split.
+  - intro e. rewrite Z.lcm_eq_0. lia.
+  - intro hn. apply Z.lcm_unique.
+    + apply Zdiv.Z_div_nonneg_nonneg.
+      * lia.
+      * apply Z.gcd_nonneg.
+    + pose proof (Z.gcd_divide_r a b) as h. 
+      apply Z.divide_abs_r in h as [k e].
+      rewrite Z.abs_mul.
+      rewrite Znumtheory.Zdivide_Zdiv_eq_2.
+      * apply Z.divide_mul_l. apply Z.divide_abs_r. reflexivity.
+      * pose proof (Z.gcd_nonneg a b).
+        pose proof (Z.gcd_eq_0_l a b). lia.
+      * apply Z.divide_abs_r. apply Z.gcd_divide_r.
+    + pose proof (Z.gcd_divide_l a b) as h. 
+      apply Z.divide_abs_r in h as [k e].
+      rewrite Z.abs_mul. rewrite Z.mul_comm.
+      rewrite Znumtheory.Zdivide_Zdiv_eq_2.
+      * apply Z.divide_mul_l. apply Z.divide_abs_r. reflexivity.
+      * pose proof (Z.gcd_nonneg a b).
+        pose proof (Z.gcd_eq_0_l a b). lia.
+      * apply Z.divide_abs_r. apply Z.gcd_divide_l.
+    + intros q ha hb.
+Abort.
 
 Close Scope R_scope.
 
