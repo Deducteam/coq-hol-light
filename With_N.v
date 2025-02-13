@@ -759,6 +759,26 @@ Proof.
   - apply lt_IZR.
 Qed.
 
+Lemma int_add_def : 
+  Z.add = 
+  (fun _28803 : Z => fun _28804 : Z => int_of_real (Rplus (IZR _28803) (IZR _28804))).
+Proof. 
+  apply fun_ext. intro n.
+  apply fun_ext. intro m.
+  rewrite <- plus_IZR. rewrite axiom_25.
+  reflexivity.
+Qed.
+
+Lemma int_mul_def : 
+  Z.mul = 
+  (fun _28847 : Z => fun _28848 : Z => int_of_real (Rmult (IZR _28847) (IZR _28848))).
+Proof.
+  apply fun_ext. intro n.
+  apply fun_ext. intro m.
+  rewrite <- mult_IZR. rewrite axiom_25.
+  reflexivity.
+Qed.
+
 Lemma int_abs_def : 
   Z.abs = (fun _28867 : Z => int_of_real (Rabs (IZR _28867))).
 Proof. 
@@ -779,26 +799,6 @@ Proof.
   - rewrite Rsgn_neg.
     2:{ apply IZR_lt. lia. }
     rewrite axiom_25. reflexivity.
-Qed.
-
-Lemma int_add_def : 
-  Z.add = 
-  (fun _28803 : Z => fun _28804 : Z => int_of_real (Rplus (IZR _28803) (IZR _28804))).
-Proof. 
-  apply fun_ext. intro n.
-  apply fun_ext. intro m.
-  rewrite <- plus_IZR. rewrite axiom_25.
-  reflexivity.
-Qed.
-
-Lemma int_mul_def : 
-  Z.mul = 
-  (fun _28847 : Z => fun _28848 : Z => int_of_real (Rmult (IZR _28847) (IZR _28848))).
-Proof.
-  apply fun_ext. intro n.
-  apply fun_ext. intro m.
-  rewrite <- mult_IZR. rewrite axiom_25.
-  reflexivity.
 Qed.
 
 Lemma int_max_def : 
