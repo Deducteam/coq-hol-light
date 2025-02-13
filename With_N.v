@@ -759,6 +759,16 @@ Proof.
   - apply lt_IZR.
 Qed.
 
+Lemma int_ge_def : 
+  Z.ge = 
+  (fun _28765 : Z => fun _28766 : Z => Rge (IZR _28765) (IZR _28766)).
+Proof.
+  rewrite real_ge_def.
+  ext n m. apply prop_ext.
+  - intros h%Z.ge_le. apply IZR_le. assumption.
+  - intros h. apply Z.le_ge. apply le_IZR. assumption.
+Qed.
+
 Lemma int_gt_def : 
   Z.gt = 
   (fun _28777 : Z => fun _28778 : Z => Rgt (IZR _28777) (IZR _28778)).
