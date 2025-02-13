@@ -759,6 +759,16 @@ Proof.
   - apply lt_IZR.
 Qed.
 
+Lemma int_gt_def : 
+  Z.gt = 
+  (fun _28777 : Z => fun _28778 : Z => Rgt (IZR _28777) (IZR _28778)).
+Proof.
+  rewrite real_gt_def.
+  ext n m. apply prop_ext.
+  - intros h%Z.gt_lt. apply IZR_lt. assumption.
+  - intros h. apply Z.lt_gt. apply lt_IZR. assumption.
+Qed.
+
 Lemma int_neg_def : 
   Z.opp = 
   (fun _28794 : Z => int_of_real (Ropp (IZR _28794))).
