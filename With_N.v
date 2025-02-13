@@ -64,7 +64,7 @@ Ltac align_ε :=
       apply (f_equal (fun g => g r) (x := fun _ => f)) ; 
       aux ; [
         intros _
-      | let g := fresh f in
+      | let g := fresh in
         let na := fresh in
         let h := fresh in
         intros g h ;
@@ -1005,6 +1005,28 @@ Lemma int_coprime_def :
 Proof.
   ext p. destruct p as [a b].
   cbn. reflexivity.
+Qed.
+
+Lemma int_gcd_def : 
+  (fun '(a,b) => Z.gcd a b) = 
+  (@ε ((prod N (prod N (prod N (prod N (prod N (prod N N)))))) -> (prod Z Z) -> Z) (fun d : (prod N (prod N (prod N (prod N (prod N (prod N N)))))) -> (prod Z Z) -> Z => forall _30960 : prod N (prod N (prod N (prod N (prod N (prod N N))))), forall a : Z, forall b : Z, (Z.le (Z_of_N (NUMERAL 0%N)) (d _30960 (@pair Z Z a b))) /\ ((Z.divide (d _30960 (@pair Z Z a b)) a) /\ ((Z.divide (d _30960 (@pair Z Z a b)) b) /\ (exists x : Z, exists y : Z, (d _30960 (@pair Z Z a b)) = (Z.add (Z.mul a x) (Z.mul b y)))))) (@pair N (prod N (prod N (prod N (prod N (prod N N))))) (NUMERAL (BIT1 (BIT0 (BIT0 (BIT1 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N (prod N (prod N N)))) (NUMERAL (BIT0 (BIT1 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N (prod N N))) (NUMERAL (BIT0 (BIT0 (BIT1 (BIT0 (BIT1 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N N)) (NUMERAL (BIT1 (BIT1 (BIT1 (BIT1 (BIT1 (BIT0 (BIT1 0%N)))))))) (@pair N (prod N N) (NUMERAL (BIT1 (BIT1 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N N (NUMERAL (BIT1 (BIT1 (BIT0 (BIT0 (BIT0 (BIT1 (BIT1 0%N)))))))) (NUMERAL (BIT0 (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 0%N))))))))))))))).
+Proof.
+  cbn.
+  align_ε.
+  - intros a b. split. 2: split. 3: split.
+    + apply Z.gcd_nonneg.
+    + apply Z.gcd_divide_l.
+    + apply Z.gcd_divide_r.
+    + pose proof (Z.gcd_bezout a b (Z.gcd a b) eq_refl) as [x [y h]].
+      exists x, y. lia.
+  - intros gcd' h.
+    ext p. destruct p as [a b].
+    specialize (h a b) as [hnn [hdl [hdr [x [y e]]]]].
+    apply Z.gcd_unique. 1-3: assumption.
+    intros q ha hb. rewrite e.
+    apply Z.divide_add_r.
+    + apply Z.divide_mul_l. assumption.
+    + apply Z.divide_mul_l. assumption.
 Qed.
 
 Close Scope R_scope.
