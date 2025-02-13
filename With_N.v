@@ -954,6 +954,22 @@ Proof.
     lia.
 Qed.
 
+Definition Rmod (a b c : R) :=
+  exists k, b - c = IZR k * a.
+
+Lemma real_mod_def : 
+  Rmod = 
+  (fun _29623 : R => fun _29624 : R => fun _29625 : R => exists q : R, (integer q) /\ ((Rminus _29624 _29625) = (Rmult q _29623))).
+Proof.
+  ext a b c. unfold Rmod. apply prop_ext.
+  - intros [k e]. exists (IZR k). split.
+    + apply IZR_integer. eexists. reflexivity.
+    + assumption.
+  - intros [q [hq e]].
+    apply integer_IZR in hq as [k ->].
+    exists k. assumption.
+Qed.
+
 Close Scope R_scope.
 
 (*****************************************************************************)
