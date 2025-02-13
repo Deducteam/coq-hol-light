@@ -954,14 +954,14 @@ Proof.
     lia.
 Qed.
 
-Definition Rmod (a b c : R) :=
+Definition Rmod_eq (a b c : R) :=
   exists k, b - c = IZR k * a.
 
 Lemma real_mod_def : 
-  Rmod = 
+  Rmod_eq = 
   (fun _29623 : R => fun _29624 : R => fun _29625 : R => exists q : R, (integer q) /\ ((Rminus _29624 _29625) = (Rmult q _29623))).
 Proof.
-  ext a b c. unfold Rmod. apply prop_ext.
+  ext a b c. unfold Rmod_eq. apply prop_ext.
   - intros [k e]. exists (IZR k). split.
     + apply IZR_integer. eexists. reflexivity.
     + assumption.
@@ -977,6 +977,16 @@ Proof.
   ext a b. apply prop_ext.
   - apply PreOmega.Z.divide_alt.
   - intros [c e]. eapply Znumtheory.Zdivide_intro with c. lia.
+Qed.
+
+Definition Zmod_eq (k a b : Z) :=
+  (k | a - b)%Z.
+
+Lemma int_mod_def : 
+  Zmod_eq = 
+  (fun _29664 : Z => fun _29665 : Z => fun _29666 : Z => Z.divide _29664 (Z.sub _29665 _29666)).
+Proof.
+  reflexivity.
 Qed.
 
 Close Scope R_scope.
