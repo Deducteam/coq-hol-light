@@ -759,6 +759,15 @@ Proof.
   - apply lt_IZR.
 Qed.
 
+Lemma int_neg_def : 
+  Z.opp = 
+  (fun _28794 : Z => int_of_real (Ropp (IZR _28794))).
+Proof.
+  ext n.
+  rewrite <- opp_IZR. rewrite axiom_25.
+  reflexivity.
+Qed.
+
 Lemma int_add_def : 
   Z.add = 
   (fun _28803 : Z => fun _28804 : Z => int_of_real (Rplus (IZR _28803) (IZR _28804))).
