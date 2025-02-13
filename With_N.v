@@ -801,6 +801,18 @@ Proof.
   reflexivity.
 Qed.
 
+Lemma int_max_def : 
+  Z.max = 
+  (fun _28938 : Z => fun _28939 : Z => int_of_real (Rmax (IZR _28938) (IZR _28939))).
+Proof.
+  ext n m.
+  eapply Rmax_case_strong. all: intro h. all: apply le_IZR in h.
+  - rewrite Z.max_l. 2: lia.
+    rewrite axiom_25. reflexivity.
+  - rewrite Z.max_r. 2: lia.
+    rewrite axiom_25. reflexivity.
+Qed.
+
 Lemma int_min_def : 
   Z.min = 
   (fun _28956 : Z => fun _28957 : Z => int_of_real (Rmin (IZR _28956) (IZR _28957))).
