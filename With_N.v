@@ -769,6 +769,15 @@ Proof.
   reflexivity.
 Qed.
 
+Lemma int_sub_def : 
+  Z.sub = 
+  (fun _28835 : Z => fun _28836 : Z => int_of_real (Rminus (IZR _28835) (IZR _28836))).
+Proof.
+  ext n m.
+  rewrite <- minus_IZR. rewrite axiom_25.
+  reflexivity.
+Qed.
+
 Lemma int_mul_def : 
   Z.mul = 
   (fun _28847 : Z => fun _28848 : Z => int_of_real (Rmult (IZR _28847) (IZR _28848))).
