@@ -996,6 +996,17 @@ Proof.
   reflexivity.
 Qed.
 
+Definition int_coprime '(a,b) :=
+  exists x y, (a * x + b * y = 1)%Z.
+
+Lemma int_coprime_def : 
+  int_coprime = 
+  (fun _29691 : prod Z Z => exists x : Z, exists y : Z, (Z.add (Z.mul (@fst Z Z _29691) x) (Z.mul (@snd Z Z _29691) y)) = (Z_of_N (NUMERAL (BIT1 0%N)))).
+Proof.
+  ext p. destruct p as [a b].
+  cbn. reflexivity.
+Qed.
+
 Close Scope R_scope.
 
 (*****************************************************************************)
