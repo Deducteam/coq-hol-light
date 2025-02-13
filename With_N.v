@@ -801,6 +801,25 @@ Proof.
   reflexivity.
 Qed.
 
+Definition Zpow n m :=
+  (n ^ Z.of_N m)%Z.
+
+Lemma int_pow_def : 
+  Zpow = 
+  (fun _28974 : Z => fun _28975 : N => int_of_real (Rpow (IZR _28974) _28975)).
+Proof.
+  ext n m.
+  rewrite <- (Nnat.N2Nat.id m).
+  generalize (N.to_nat m) as k. clear m. intro m.
+  unfold Zpow, Rpow. 
+  rewrite nat_N_Z.
+  rewrite <- Rfunctions.pow_powerRZ.
+  induction m as [| m ih].
+  - cbn. rewrite axiom_25. reflexivity.
+  - rewrite Nat2Z.inj_succ. rewrite Z.pow_succ_r. 2: lia.
+    rewrite ih. cbn.
+Admitted.
+
 Definition Zdiv a b :=
   (Z.sgn b * (a / Z.abs b))%Z.
 
