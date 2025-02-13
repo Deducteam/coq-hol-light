@@ -970,12 +970,19 @@ Proof.
     exists k. assumption.
 Qed.
 
+(** TODO Replace by [PreOmega.Z.divide_alt] once Coq 8.19 support is dropped **)
+Lemma divide_alt x y : Z.divide x y -> exists z, y = (x * z)%Z.
+Proof. 
+  intros [z ->]. 
+  exists z. apply Z.mul_comm. 
+Qed.
+
 Lemma int_divides_def : 
   Z.divide = 
   (fun _29644 : Z => fun _29645 : Z => exists x : Z, _29645 = (Z.mul _29644 x)).
 Proof.
   ext a b. apply prop_ext.
-  - apply PreOmega.Z.divide_alt.
+  - apply divide_alt.
   - intros [c e]. eapply Znumtheory.Zdivide_intro with c. lia.
 Qed.
 
