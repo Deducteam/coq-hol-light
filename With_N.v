@@ -1046,6 +1046,17 @@ Proof.
   - intro hn.
     set (m := Z.lcm a b).
     set (d := (Z.abs(a * b) / m)%Z).
+    assert (hmnz : m <> 0%Z).
+    { pose proof (Z.lcm_eq_0 a b).
+      lia. 
+    }
+    assert (hmab : (Z.abs (a * b) mod m)%Z = 0%Z).
+    { apply Znumtheory.Zdivide_mod.
+      rewrite Z.divide_abs_r.
+      apply Z.lcm_least.
+      - apply Z.divide_mul_l. reflexivity.
+      - apply Z.divide_mul_r. reflexivity.
+    }
     assert (h : Z.gcd a b = d).
     { apply Z.gcd_unique.
       - apply Zdiv.Z_div_nonneg_nonneg.
@@ -1056,10 +1067,6 @@ Proof.
       - intros n ha hb.
         assert (hnnz : n <> 0%Z).
         { destruct ha as [k e]. lia. }
-        assert (hmnz : m <> 0%Z).
-        { pose proof (Z.lcm_eq_0 a b).
-          lia. 
-        }
         assert (hndm : (n | m)%Z).
         { transitivity b. 1: assumption. apply Z.divide_lcm_r. }
         replace n with (m * n / m)%Z.
@@ -1083,14 +1090,7 @@ Proof.
         replace (m * d / n)%Z with (Z.abs (a * b) / n)%Z.
         2:{
           unfold d.
-          rewrite <- Zdiv.Z_div_exact_full_2. 2: assumption.
-          2:{ 
-            apply Znumtheory.Zdivide_mod.
-            rewrite Z.divide_abs_r.
-            apply Z.lcm_least.
-            - apply Z.divide_mul_l. reflexivity.
-            - apply Z.divide_mul_r. reflexivity.
-          }
+          rewrite <- Zdiv.Z_div_exact_full_2. 2,3: assumption.
           lia.
         }
         apply Z.lcm_least.
@@ -1120,7 +1120,16 @@ Proof.
           apply Z.mul_divide_mono_r.
           assumption.
     }
-Abort.
+    unfold d in h.
+    apply (f_equal (Z.mul m)) in h as e.
+    rewrite <- Zdiv.Z_div_exact_full_2 in e. 2,3: assumption.
+    apply (f_equal (fun x => (x / Z.gcd a b)%Z)) in e.
+    assert (hgcd : Z.gcd a b <> 0%Z).
+    { pose proof (Z.gcd_divide_r a b) as []. lia. }
+    rewrite Z.divide_div_mul_exact in e. 2: assumption. 2: reflexivity.
+    rewrite Z.div_same in e. 2: assumption.
+    lia.
+Qed.
 
 Close Scope R_scope.
 
