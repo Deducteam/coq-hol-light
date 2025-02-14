@@ -1062,8 +1062,35 @@ Proof.
       - apply Zdiv.Z_div_nonneg_nonneg.
         + lia.
         + apply Z.lcm_nonneg.
-      - admit.
-      - admit.
+      - unfold d. 
+        assert (h : (b | m)%Z).
+        { apply Z.divide_lcm_r. }
+        apply Z.mul_divide_mono_l with (p := a) in h.
+        apply Z.divide_abs_l in h.
+        apply Z.divide_div with (a := m) in h. 
+        2: assumption.
+        2:{ apply Z.mod_divide. all: assumption. }
+        rewrite Znumtheory.Zdivide_Zdiv_eq_2 in h.
+        2:{ pose proof (Z.lcm_nonneg a b). lia. }
+        2: reflexivity.
+        rewrite Z.div_same in h. 2: assumption.
+        replace (a * 1)%Z with a in h by lia.
+        assumption.
+      - unfold d. 
+        assert (h : (a | m)%Z).
+        { apply Z.divide_lcm_l. }
+        apply Z.mul_divide_mono_r with (p := b) in h.
+        apply Z.divide_abs_l in h.
+        apply Z.divide_div with (a := m) in h. 
+        2: assumption.
+        2:{ apply Z.mod_divide. all: assumption. }
+        replace (m * b)%Z with (b * m)%Z in h by lia.
+        rewrite Znumtheory.Zdivide_Zdiv_eq_2 in h.
+        2:{ pose proof (Z.lcm_nonneg a b). lia. }
+        2: reflexivity.
+        rewrite Z.div_same in h. 2: assumption.
+        replace (b * 1)%Z with b in h by lia.
+        assumption.
       - intros n ha hb.
         assert (hnnz : n <> 0%Z).
         { destruct ha as [k e]. lia. }
