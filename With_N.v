@@ -1043,27 +1043,83 @@ Proof.
   ext p. destruct p as [a b]. cbn.
   rewrite thm_COND_ELIM_THM. split.
   - intro e. rewrite Z.lcm_eq_0. lia.
-  - intro hn. apply Z.lcm_unique.
-    + apply Zdiv.Z_div_nonneg_nonneg.
-      * lia.
-      * apply Z.gcd_nonneg.
-    + pose proof (Z.gcd_divide_r a b) as h. 
-      apply Z.divide_abs_r in h as [k e].
-      rewrite Z.abs_mul.
-      rewrite Znumtheory.Zdivide_Zdiv_eq_2.
-      * apply Z.divide_mul_l. apply Z.divide_abs_r. reflexivity.
-      * pose proof (Z.gcd_nonneg a b).
-        pose proof (Z.gcd_eq_0_l a b). lia.
-      * apply Z.divide_abs_r. apply Z.gcd_divide_r.
-    + pose proof (Z.gcd_divide_l a b) as h. 
-      apply Z.divide_abs_r in h as [k e].
-      rewrite Z.abs_mul. rewrite Z.mul_comm.
-      rewrite Znumtheory.Zdivide_Zdiv_eq_2.
-      * apply Z.divide_mul_l. apply Z.divide_abs_r. reflexivity.
-      * pose proof (Z.gcd_nonneg a b).
-        pose proof (Z.gcd_eq_0_l a b). lia.
-      * apply Z.divide_abs_r. apply Z.gcd_divide_l.
-    + intros q ha hb.
+  - intro hn.
+    set (m := Z.lcm a b).
+    set (d := (Z.abs(a * b) / m)%Z).
+    assert (h : Z.gcd a b = d).
+    { apply Z.gcd_unique.
+      - apply Zdiv.Z_div_nonneg_nonneg.
+        + lia.
+        + apply Z.lcm_nonneg.
+      - admit.
+      - admit.
+      - intros n ha hb.
+        assert (hnnz : n <> 0%Z).
+        { destruct ha as [k e]. lia. }
+        assert (hmnz : m <> 0%Z).
+        { pose proof (Z.lcm_eq_0 a b).
+          lia. 
+        }
+        assert (hndm : (n | m)%Z).
+        { transitivity b. 1: assumption. apply Z.divide_lcm_r. }
+        replace n with (m * n / m)%Z.
+        2:{ rewrite Z.mul_comm. apply Z.div_mul. assumption. }
+        replace d with (m * d / m)%Z.
+        2:{ rewrite Z.mul_comm. apply Z.div_mul. assumption. }
+        apply Z.divide_div. 
+        1: assumption. 1:{ apply Z.divide_mul_l. reflexivity. }
+        replace (m * d)%Z with (((m * d) / n) * n)%Z.
+        2:{
+          replace (m * d)%Z with (d * m)%Z by lia.
+          rewrite Z.divide_div_mul_exact. 2,3: assumption.
+          rewrite <- Z.mul_assoc.
+          rewrite Z.mul_comm.
+          replace ((m / n) * n)%Z with (n * (m / n))%Z by lia.
+          rewrite <- Zdiv.Z_div_exact_full_2. 2: assumption.
+          2:{ apply Znumtheory.Zdivide_mod. assumption. }
+          lia.
+        }
+        apply Z.mul_divide_mono_r.
+        replace (m * d / n)%Z with (Z.abs (a * b) / n)%Z.
+        2:{
+          unfold d.
+          rewrite <- Zdiv.Z_div_exact_full_2. 2: assumption.
+          2:{ 
+            apply Znumtheory.Zdivide_mod.
+            rewrite Z.divide_abs_r.
+            apply Z.lcm_least.
+            - apply Z.divide_mul_l. reflexivity.
+            - apply Z.divide_mul_r. reflexivity.
+          }
+          lia.
+        }
+        apply Z.lcm_least.
+        + replace a with ((n * a) / n)%Z at 1. 
+          2:{
+            rewrite Z.divide_div_mul_exact. 2,3: assumption.
+            rewrite <- Zdiv.Z_div_exact_full_2. 2: assumption.
+            2:{ apply Znumtheory.Zdivide_mod. assumption. }
+            reflexivity.
+          }
+          apply Z.divide_div. 1: assumption.
+          1:{ apply Z.divide_mul_l. reflexivity. }
+          rewrite Z.divide_abs_r.
+          rewrite Z.mul_comm.
+          apply Z.mul_divide_mono_l.
+          assumption.
+        + replace b with ((n * b) / n)%Z at 1.
+          2:{
+            rewrite Z.divide_div_mul_exact. 2,3: assumption.
+            rewrite <- Zdiv.Z_div_exact_full_2. 2: assumption.
+            2:{ apply Znumtheory.Zdivide_mod. assumption. }
+            reflexivity.
+          }
+          apply Z.divide_div. 1: assumption.
+          1:{ apply Z.divide_mul_l. reflexivity. }
+          rewrite Z.divide_abs_r.
+          apply Z.mul_divide_mono_r.
+          assumption.
+    }
 Abort.
 
 Close Scope R_scope.
