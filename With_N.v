@@ -1032,12 +1032,23 @@ Proof.
     + apply Z.divide_mul_l. assumption.
 Qed.
 
+Lemma Zdiv_pos a b :
+  (0 < b)%Z ->
+  Zdiv a b = Z.div a b.
+Proof.
+  intro h.
+  unfold Zdiv.
+  rewrite Z.sgn_pos. 2: assumption.
+  rewrite Z.abs_eq. 2: lia.
+  lia.
+Qed.
+
 Definition int_lcm '(a,b) :=
   Z.lcm a b.
 
 Lemma int_lcm_def : 
   int_lcm = 
-  (fun _30961 : prod Z Z => @COND Z ((Z.mul (@fst Z Z _30961) (@snd Z Z _30961)) = (Z_of_N (NUMERAL 0%N))) (Z_of_N (NUMERAL 0%N)) (Z.div (Z.abs (Z.mul (@fst Z Z _30961) (@snd Z Z _30961))) (int_gcd (@pair Z Z (@fst Z Z _30961) (@snd Z Z _30961))))).
+  (fun _30961 : prod Z Z => @COND Z ((Z.mul (@fst Z Z _30961) (@snd Z Z _30961)) = (Z_of_N (NUMERAL 0%N))) (Z_of_N (NUMERAL 0%N)) (Zdiv (Z.abs (Z.mul (@fst Z Z _30961) (@snd Z Z _30961))) (int_gcd (@pair Z Z (@fst Z Z _30961) (@snd Z Z _30961))))).
 Proof.
   unfold int_lcm, int_gcd. cbn.
   ext p. destruct p as [a b]. cbn.
@@ -1155,6 +1166,8 @@ Proof.
     { pose proof (Z.gcd_divide_r a b) as []. lia. }
     rewrite Z.divide_div_mul_exact in e. 2: assumption. 2: reflexivity.
     rewrite Z.div_same in e. 2: assumption.
+    rewrite Zdiv_pos.
+    2:{ pose proof (Z.gcd_nonneg a b). lia. }
     lia.
 Qed.
 
