@@ -4,8 +4,8 @@ set -e # to exit as soon as there is an error
 
 hollight_version=3.0.0 # for dependencies
 hollight_commit=28e4aed
-hol2dk_commit=7eb6a02
-lambdapi_commit=21ee7f3d
+hol2dk_commit=3a265dd
+lambdapi_commit=08d0f00d
 
 opam_version=2.2.1
 dune_version=3.17.1
@@ -101,7 +101,7 @@ config_output_dir() {
     mkdir -p output
     cd output
     if test -f Makefile; then make $jobs clean-all; fi
-    hol2dk config $hollight_file $root_path HOLLight_Real_With_N.mappings ../../With_N.v Coq.NArith.BinNat Coq.Reals.Rbase Coq.Reals.Rdefinitions Coq.Reals.Rbasic_fun ../../With_N.lp ../../With_N.mk
+    hol2dk config $hollight_file $root_path Coq.NArith.BinNat Coq.Reals.Reals HOLLight_Real_With_N.mappings ../../With_N.v ../../With_N.lp ../../With_N.mk
     cd ..
 }
     
@@ -179,13 +179,13 @@ eval `opam env`
 stage 2 install_hol_light_deps
 stage 3 install_lambdapi
 stage 4 install_coq
-stage 5 install_hol2dk
-stage 6 install_hol_light
-stage 7 patch_hol_light
-stage 8 dump_proofs
-stage 9 config_output_dir
-stage 10 translate_proofs
-stage 11 install_coq_deps
-stage 12 check_proofs
-stage 13 create_and_check_opam_library
-stage 14 compare_opam_files
+stage 5 install_coq_deps
+stage 6 install_hol2dk
+stage 7 install_hol_light
+stage 8 patch_hol_light
+stage 9 dump_proofs
+stage 10 config_output_dir
+stage 11 create_and_check_opam_library
+stage 12 compare_opam_files
+stage 13 translate_proofs
+stage 14 check_proofs
