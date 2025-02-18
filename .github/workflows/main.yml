@@ -1,7 +1,4 @@
-# following https://github.com/coq-community/huffman/blob/master/.github/workflows/docker-action.yml
-# See also:
-# https://github.com/coq-community/docker-coq-action#readme
-# https://github.com/erikmd/docker-coq-github-action-demo
+# following https://github.com/coq-community/docker-coq-action
 
 name: Docker CI
 
@@ -17,14 +14,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        image:
-          - 'coqorg/coq:dev'
-          - 'coqorg/coq:8.20'
-          - 'coqorg/coq:8.19'
+        coq_version:
+          - dev
+          - '8.20'
+          - '8.19'
       fail-fast: false
     steps:
       - uses: actions/checkout@v3
       - uses: coq-community/docker-coq-action@v1
         with:
           opam_file: 'coq-hol-light.opam'
-          custom_image: ${{ matrix.image }}
+          coq_version: ${{ matrix.coq_version }}
