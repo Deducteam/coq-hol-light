@@ -2,10 +2,7 @@ Require Import HOLLight_Real_With_N.mappings.
 
 (* Utility lemmas to be moved to HOLLight_Real_With_N.mappings. *)
 
-Lemma prove_COND (P Q R : Prop) :
-  (P -> Q) ->
-  (~ P -> R) ->
-  COND P Q R.
+Lemma prove_COND (P Q R : Prop) : (P -> Q) -> (~ P -> R) -> COND P Q R.
 Proof.
   intros hq hr.
   destruct (prop_degen P) as [-> | ->].
@@ -13,11 +10,7 @@ Proof.
   - rewrite COND_False. auto.
 Qed.
 
-Lemma COND_elim (P Q R G : Prop) :
-  COND P Q R ->
-  (P -> Q -> G) ->
-  (~ P -> R -> G) ->
-  G.
+Lemma COND_elim (P Q R G : Prop) : COND P Q R -> (P -> Q -> G) -> (~ P -> R -> G) -> G.
 Proof.
   intros h hq hr.
   destruct (prop_degen P) as [-> | ->].
@@ -25,25 +18,14 @@ Proof.
   - rewrite COND_False in h. auto.
 Qed.
 
-Lemma align_ε (A : Type') (P : A -> Prop) a :
-  P a ->
-  (forall x, P x -> a = x) ->
-  a = ε P.
-Proof.
-  intros ha hg.
-  apply hg. 
-  apply ε_spec.
-  exists a. apply ha.
-Qed.
+Lemma align_ε (A : Type') (P : A -> Prop) a : P a -> (forall x, P x -> a = x) -> a = ε P.
+Proof. intros ha hg. apply hg. apply ε_spec. exists a. apply ha. Qed.
 
-Tactic Notation "ext" ident(x) :=
-  apply fun_ext ; intro x.
+Tactic Notation "ext" ident(x) := apply fun_ext ; intro x.
 
-Tactic Notation "ext" ident(x) ident(y) :=
-  ext x ; ext y.
+Tactic Notation "ext" ident(x) ident(y) := ext x ; ext y.
 
-Tactic Notation "ext" ident(x) ident(y) ident(z) :=
-  ext x ; ext y ; ext z.
+Tactic Notation "ext" ident(x) ident(y) ident(z) := ext x ; ext y ; ext z.
 
 Ltac gobble f x :=
   let g := fresh in
@@ -840,8 +822,10 @@ Proof.
 Qed.
 
 Definition Zdiv a b := (Z.sgn b * (a / Z.abs b))%Z.
+(* = Coq.ZArith.Zeuclid.ZEuclid.div but Coq.ZArith.Zeuclid is deprecated *)
 
 Definition Zrem a b := (a mod Z.abs b)%Z.
+(* = Coq.ZArith.Zeuclid.ZEuclid.modulo but Coq.ZArith.Zeuclid is deprecated *)
 
 Lemma div_def : 
   Zdiv = (@ε ((prod N (prod N N)) -> Z -> Z -> Z) (fun q : (prod N (prod N N)) -> Z -> Z -> Z => forall _29326 : prod N (prod N N), exists r : Z -> Z -> Z, forall m : Z, forall n : Z, @COND Prop (n = (Z_of_N (NUMERAL 0%N))) (((q _29326 m n) = (Z_of_N (NUMERAL 0%N))) /\ ((r m n) = m)) ((Z.le (Z_of_N (NUMERAL 0%N)) (r m n)) /\ ((Z.lt (r m n) (Z.abs n)) /\ (m = (Z.add (Z.mul (q _29326 m n) n) (r m n)))))) (@pair N (prod N N) (NUMERAL (BIT0 (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N N (NUMERAL (BIT1 (BIT0 (BIT0 (BIT1 (BIT0 (BIT1 (BIT1 0%N)))))))) (NUMERAL (BIT0 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 (BIT1 0%N))))))))))).
@@ -897,6 +881,12 @@ Proof.
     pose proof (Z.div_mod m (Z.abs n)) as e. 
     rewrite <- Z.sgn_abs in e at 1.
     lia.
+Qed.
+
+Lemma Zdiv_pos a b : (0 < b)%Z -> Zdiv a b = Z.div a b.
+Proof.
+  intro h. unfold Zdiv. rewrite Z.sgn_pos. 2: assumption.
+  rewrite Z.abs_eq. 2: lia. lia.
 Qed.
 
 Definition Rmod_eq (a b c : R) := exists k, b - c = IZR k * a.
@@ -962,7 +952,7 @@ Qed.
 Definition int_lcm '(a,b) := Z.lcm a b.
 
 Lemma int_lcm_def : 
-  int_lcm = (fun _30961 : prod Z Z => @COND Z ((Z.mul (@fst Z Z _30961) (@snd Z Z _30961)) = (Z_of_N (NUMERAL 0%N))) (Z_of_N (NUMERAL 0%N)) (Z.div (Z.abs (Z.mul (@fst Z Z _30961) (@snd Z Z _30961))) (int_gcd (@pair Z Z (@fst Z Z _30961) (@snd Z Z _30961))))).
+  int_lcm = (fun y0 : prod Z Z => @COND Z ((Z.mul (@fst Z Z y0) (@snd Z Z y0)) = (Z_of_N (NUMERAL 0%N))) (Z_of_N (NUMERAL 0%N)) (Zdiv (Z.abs (Z.mul (@fst Z Z y0) (@snd Z Z y0))) (int_gcd (@pair Z Z (@fst Z Z y0) (@snd Z Z y0))))).
 Proof.
   unfold int_lcm, int_gcd. cbn.
   ext p. destruct p as [a b]. cbn.
@@ -1080,6 +1070,8 @@ Proof.
     { pose proof (Z.gcd_divide_r a b) as []. lia. }
     rewrite Z.divide_div_mul_exact in e. 2: assumption. 2: reflexivity.
     rewrite Z.div_same in e. 2: assumption.
+    rewrite Zdiv_pos.
+    2:{ pose proof (Z.gcd_nonneg a b). lia. }
     lia.
 Qed.
 
