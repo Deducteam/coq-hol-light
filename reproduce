@@ -6,6 +6,7 @@ hollight_version=3.0.0 # for dependencies
 hollight_commit=28e4aed
 hol2dk_commit=3a265dd
 lambdapi_commit=08d0f00d
+coq_hol_light_real_commit=d54d1ad
 
 opam_version=2.2.1
 dune_version=3.17.1
@@ -61,10 +62,18 @@ install_coq() {
     opam install -y coq.$coq_version
 }
 
-install_coq_deps() {
+install_deps() {
     line
-    echo install coq dependencies ...
+    echo install dependencies ...
     opam install -y --deps-only .
+}
+
+install_coq_hol_light_real() {
+    checkout_commit https://github.com/Deducteam/coq-hol-light-real-with-N $coq_hol_light_real_commit
+    cd coq-hol-light-real-with-N
+    git checkout -b reproduce
+    opam install -y .
+    cd ..
 }
 
 install_hol2dk() {
@@ -123,6 +132,15 @@ check_proofs() {
     cd ..
 }
 
+remove_empty_modules() {
+    sed -e "s/${base}_//g" \
+        -e "/^Require Import ${root_path}\.theory_hol\.$/d" \
+        -e "/^Require Import ${root_path}\.types\.$/d" \
+        -e "/^Require Import ${root_path}\.axioms\.$/d" \
+        -e "/^Axiom thm_HAS_INTEGRAL_TWIZZLE_INTERVAL /d" \
+        $1
+}
+
 create_and_check_opam_library() {
     line
     echo create opam library ...
@@ -131,9 +149,9 @@ create_and_check_opam_library() {
     cd ..
     mkdir -p opam
     cd opam
-    cp ../../Makefile ../../With_N.v ../output/theory_hol.v .
-    sed -e "s/${base}_//g" -e "/^Require Import ${root_path}.types.$/d" ../output/${base}_terms.v > terms.v
-    sed -e "s/${base}_//g" -e "/^Require Import ${root_path}.types.$/d" -e '/^Require Import ${root_path}.axioms.$/d' -e "/^Axiom thm_HAS_INTEGRAL_TWIZZLE_INTERVAL /d" ../output/${base}_opam.v > theorems.v
+    cp ../../Makefile ../../With_N.v .
+    remove_empty_modules ../output/${base}_terms.v > terms.v
+    remove_empty_modules ../output/${base}_opam.v > theorems.v
     make
     cd ..
 }
@@ -145,7 +163,7 @@ compare_opam_file() {
 }
 
 compare_opam_files() {
-    for f in theory_hol.v terms.v theorems.v
+    for f in terms.v theorems.v
     do
         compare_opam_file $f
     done
@@ -179,13 +197,15 @@ eval `opam env`
 stage 2 install_hol_light_deps
 stage 3 install_lambdapi
 stage 4 install_coq
-stage 5 install_coq_deps
-stage 6 install_hol2dk
-stage 7 install_hol_light
-stage 8 patch_hol_light
-stage 9 dump_proofs
-stage 10 config_output_dir
-stage 11 create_and_check_opam_library
-stage 12 compare_opam_files
-stage 13 translate_proofs
-stage 14 check_proofs
+stage 5 install_deps
+stage 6 install_coq_hol_light_real
+stage 7 install_hol2dk
+stage 8 install_hol_light
+stage 9 patch_hol_light
+stage 10 dump_proofs
+stage 11 config_output_dir
+stage 12 create_and_check_opam_library
+stage 13 compare_opam_files
+exit
+stage 14 translate_proofs
+stage 15 check_proofs
