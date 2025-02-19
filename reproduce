@@ -6,7 +6,7 @@ hollight_version=3.0.0 # for dependencies
 hollight_commit=28e4aed
 hol2dk_commit=3a265dd
 lambdapi_commit=08d0f00d
-coq_hollight_real_commit=d54d1ad
+coq_hollight_real_commit=821eda1
 
 opam_version=2.2.1
 dune_version=3.17.1
