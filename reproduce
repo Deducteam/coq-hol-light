@@ -6,7 +6,7 @@ hollight_version=3.0.0 # for dependencies
 hollight_commit=28e4aed
 hol2dk_commit=3a265dd
 lambdapi_commit=08d0f00d
-coq_hol_light_real_commit=d54d1ad
+coq_hollight_real_commit=d54d1ad
 
 opam_version=2.2.1
 dune_version=3.17.1
@@ -41,7 +41,7 @@ create_opam_switch() {
     opam switch create . $ocaml_version
 }
 
-install_hol_light_deps() {
+install_hollight_deps() {
     line
     echo install HOL-Light dependencies ...
     opam install -y --deps-only hol_light.$hollight_version
@@ -65,11 +65,11 @@ install_coq() {
 install_deps() {
     line
     echo install dependencies ...
-    opam install -y --deps-only .
+    opam install -y --deps-only ..
 }
 
-install_coq_hol_light_real() {
-    checkout_commit https://github.com/Deducteam/coq-hol-light-real-with-N $coq_hol_light_real_commit
+install_coq_hollight_real() {
+    checkout_commit https://github.com/Deducteam/coq-hol-light-real-with-N $coq_hollight_real_commit
     cd coq-hol-light-real-with-N
     git checkout -b reproduce
     opam install -y .
@@ -83,14 +83,14 @@ install_hol2dk() {
     cd ..
 }
 
-install_hol_light() {
+install_hollight() {
     checkout_commit https://github.com/jrh13/hol-light.git $hollight_commit
     cd hol-light
     make
     cd ..
 }
 
-patch_hol_light() {
+patch_hollight() {
     line
     echo patch hol-light ...
     hol2dk patch
@@ -194,14 +194,14 @@ fi
 
 stage 1 create_opam_switch
 eval `opam env`
-stage 2 install_hol_light_deps
+stage 2 install_hollight_deps
 stage 3 install_lambdapi
 stage 4 install_coq
 stage 5 install_deps
-stage 6 install_coq_hol_light_real
+stage 6 install_coq_hollight_real
 stage 7 install_hol2dk
-stage 8 install_hol_light
-stage 9 patch_hol_light
+stage 8 install_hollight
+stage 9 patch_hollight
 stage 10 dump_proofs
 stage 11 config_output_dir
 stage 12 create_and_check_opam_library
