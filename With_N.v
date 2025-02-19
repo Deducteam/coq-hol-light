@@ -168,7 +168,7 @@ Proof. exact eq_R_struct. Qed.
 Require Import HOLLight_Real_With_N.terms.
 
 Lemma real_add_of_num p q :
-  real_of_num (p + q) = real_add (real_of_num p) (real_of_num q).
+  real_of_num (p + q)%N = real_add (real_of_num p) (real_of_num q).
 Proof.
   unfold real_of_num, real_add.
   f_equal. rewrite treal_add_of_num. apply fun_ext; intro x.
