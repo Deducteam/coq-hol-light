@@ -15,9 +15,10 @@ The translated theorems are provided as axioms in order to have a fast Require b
 
 The types and functions currently [aligned](https://github.com/Deducteam/coq-hol-light/blob/main/With_N.lp) are:
 - types: unit, prod, list, option, sum, ascii, N, R, Z
-- functions on N: pred, add, mul, pow, le, lt, ge, gt, max, min, sub, div, modulo
+- functions on N: pred, add, mul, pow, le, lt, ge, gt, max, min, sub, div, modulo, even, odd, factorial
+- functions on Z: IZR, le, lt, ge, gt, opp, add, sub, mul, abs, sgn, max, min, pow, div, rem, divide, coprime, gcd, lcm
 - functions on list: app, rev, map, removelast, In, hd, tl
-- functions on R: Rle, Rplus, Rmult, Rinv, Ropp, Rabs, Rdiv, Rminus, Rge, Rgt, Rlt, Rmax, Rmin, IZR
+- functions on R: Rle, Rplus, Rmult, Rinv, Ropp, Rabs, Rdiv, Rminus, Rge, Rgt, Rlt, Rmax, Rmin, IZR, Rsgn, Rmod_eq, Rpow
 
 Your help is welcome to align more functions!
 
@@ -25,9 +26,9 @@ Your help is welcome to align more functions!
 
 You can easily contribute by proving more mappings in Coq:
 
-- Look in [terms.v](https://github.com/Deducteam/coq-hol-light/blob/main/terms.v) for the definition of a function symbol that you want to replace, e.g. the factorial function FACT on N; note that it is followed by a lemma FACT_DEF stating what FACT it equal to.
+- Look in [terms.v](https://github.com/Deducteam/coq-hol-light/blob/main/terms.v) for the definition of a function symbol, say f, that you want to replace; note that it is followed by a lemma f_DEF stating what f is equal to.
 
-- Copy and paste in [With_N.v](https://github.com/Deducteam/coq-hol-light/blob/main/With_N.v) the lemma FACT_DEF, and try to prove it when FACT is replaced by your own function.
+- Copy and paste in [With_N.v](https://github.com/Deducteam/coq-hol-light/blob/main/With_N.v) the lemma f_DEF, and try to prove it when f is replaced by your own function.
 
 - Create a [pull request](https://github.com/Deducteam/coq-hol-light/pulls)
 
