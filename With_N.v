@@ -1,58 +1,5 @@
 Require Import HOLLight_Real_With_N.mappings.
 
-(* Utility lemmas to be moved to HOLLight_Real_With_N.mappings. *)
-
-Lemma prove_COND (P Q R : Prop) : (P -> Q) -> (~ P -> R) -> COND P Q R.
-Proof.
-  intros hq hr.
-  destruct (prop_degen P) as [-> | ->].
-  - rewrite COND_True. auto.
-  - rewrite COND_False. auto.
-Qed.
-
-Lemma COND_elim (P Q R G : Prop) : COND P Q R -> (P -> Q -> G) -> (~ P -> R -> G) -> G.
-Proof.
-  intros h hq hr.
-  destruct (prop_degen P) as [-> | ->].
-  - rewrite COND_True in h. auto.
-  - rewrite COND_False in h. auto.
-Qed.
-
-Lemma align_ε (A : Type') (P : A -> Prop) a : P a -> (forall x, P x -> a = x) -> a = ε P.
-Proof. intros ha hg. apply hg. apply ε_spec. exists a. apply ha. Qed.
-
-Tactic Notation "ext" ident(x) := apply fun_ext ; intro x.
-
-Tactic Notation "ext" ident(x) ident(y) := ext x ; ext y.
-
-Tactic Notation "ext" ident(x) ident(y) ident(z) := ext x ; ext y ; ext z.
-
-Ltac gobble f x :=
-  let g := fresh in
-  set (g := f x) in * ;
-  clearbody g ; clear f x ;
-  rename g into f.
-
-Ltac align_ε :=
-  let rec aux :=
-    lazymatch goal with 
-    | |- _ = ε _ => apply align_ε
-    | |- _ ?x = ε _ ?x => apply (f_equal (fun f => f x)) ; aux
-    | |- ?f = ε _ ?r => 
-      apply (f_equal (fun g => g r) (x := fun _ => f)) ; 
-      aux ; [
-        intros _
-      | let g := fresh in
-        let na := fresh in
-        let h := fresh in
-        intros g h ;
-        ext na ; specialize (h na) ; gobble g na ;
-        revert g h
-      ]
-    end
-  in
-  aux.
-
 (*****************************************************************************)
 (* Proof that Coq R is a fourcolor.model of real numbers. *)
 (*****************************************************************************)
@@ -931,8 +878,7 @@ Definition int_gcd '(a,b) := Z.gcd a b.
 Lemma int_gcd_def : 
   int_gcd = (@ε ((prod N (prod N (prod N (prod N (prod N (prod N N)))))) -> (prod Z Z) -> Z) (fun d : (prod N (prod N (prod N (prod N (prod N (prod N N)))))) -> (prod Z Z) -> Z => forall _30960 : prod N (prod N (prod N (prod N (prod N (prod N N))))), forall a : Z, forall b : Z, (Z.le (Z_of_N (NUMERAL 0%N)) (d _30960 (@pair Z Z a b))) /\ ((Z.divide (d _30960 (@pair Z Z a b)) a) /\ ((Z.divide (d _30960 (@pair Z Z a b)) b) /\ (exists x : Z, exists y : Z, (d _30960 (@pair Z Z a b)) = (Z.add (Z.mul a x) (Z.mul b y)))))) (@pair N (prod N (prod N (prod N (prod N (prod N N))))) (NUMERAL (BIT1 (BIT0 (BIT0 (BIT1 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N (prod N (prod N N)))) (NUMERAL (BIT0 (BIT1 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N (prod N N))) (NUMERAL (BIT0 (BIT0 (BIT1 (BIT0 (BIT1 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N N)) (NUMERAL (BIT1 (BIT1 (BIT1 (BIT1 (BIT1 (BIT0 (BIT1 0%N)))))))) (@pair N (prod N N) (NUMERAL (BIT1 (BIT1 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N N (NUMERAL (BIT1 (BIT1 (BIT0 (BIT0 (BIT0 (BIT1 (BIT1 0%N)))))))) (NUMERAL (BIT0 (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 0%N))))))))))))))).
 Proof.
-  unfold int_gcd. cbn.
-  align_ε.
+  cbn. align_ε. unfold int_gcd.
   - intros a b. split. 2: split. 3: split.
     + apply Z.gcd_nonneg.
     + apply Z.gcd_divide_l.
