@@ -1,81 +1,10 @@
+Require Import HOLLight_Real_With_N.mappings.
+
 (*****************************************************************************)
 (* Proof that Coq R is a fourcolor.model of real numbers. *)
 (*****************************************************************************)
 
-Require Import HOLLight_Real_With_N.mappings Coq.Reals.Rbase Coq.Reals.Rdefinitions Coq.Reals.Rbasic_fun.
-
-(** Utility lemmas **)
-
-Lemma prove_COND (P Q R : Prop) :
-  (P -> Q) ->
-  (~ P -> R) ->
-  COND P Q R.
-Proof.
-  intros hq hr.
-  destruct (prop_degen P) as [-> | ->].
-  - rewrite COND_True. auto.
-  - rewrite COND_False. auto.
-Qed.
-
-Lemma COND_elim (P Q R G : Prop) :
-  COND P Q R ->
-  (P -> Q -> G) ->
-  (~ P -> R -> G) ->
-  G.
-Proof.
-  intros h hq hr.
-  destruct (prop_degen P) as [-> | ->].
-  - rewrite COND_True in h. auto.
-  - rewrite COND_False in h. auto.
-Qed.
-
-Lemma align_ε (A : Type') (P : A -> Prop) a :
-  P a ->
-  (forall x, P x -> a = x) ->
-  a = ε P.
-Proof.
-  intros ha hg.
-  apply hg. 
-  apply ε_spec.
-  exists a. apply ha.
-Qed.
-
-Tactic Notation "ext" ident(x) :=
-  apply fun_ext ; intro x.
-
-Tactic Notation "ext" ident(x) ident(y) :=
-  ext x ; ext y.
-
-Tactic Notation "ext" ident(x) ident(y) ident(z) :=
-  ext x ; ext y ; ext z.
-
-Ltac gobble f x :=
-  let g := fresh in
-  set (g := f x) in * ;
-  clearbody g ; clear f x ;
-  rename g into f.
-
-Ltac align_ε :=
-  let rec aux :=
-    lazymatch goal with 
-    | |- _ = ε _ => apply align_ε
-    | |- _ ?x = ε _ ?x => apply (f_equal (fun f => f x)) ; aux
-    | |- ?f = ε _ ?r => 
-      apply (f_equal (fun g => g r) (x := fun _ => f)) ; 
-      aux ; [
-        intros _
-      | let g := fresh in
-        let na := fresh in
-        let h := fresh in
-        intros g h ;
-        ext na ; specialize (h na) ; gobble g na ;
-        revert g h
-      ]
-    end
-  in
-  aux.
-
-(** End utility **)
+Require Import Coq.Reals.Reals.
 
 Open Scope R_scope.
 
@@ -179,8 +108,6 @@ Lemma eq_R_model :
   @eq (model_structure R_model) = @Logic.eq (val (model_structure R_model)).
 Proof. exact eq_R_struct. Qed.
 
-Close Scope R_scope.
-
 (*****************************************************************************)
 (* Proof that real is a fourcolor.model of real numbers. *)
 (*****************************************************************************)
@@ -188,7 +115,7 @@ Close Scope R_scope.
 Require Import HOLLight_Real_With_N.terms.
 
 Lemma real_add_of_num p q :
-  real_of_num (p + q) = real_add (real_of_num p) (real_of_num q).
+  real_of_num (p + q)%N = real_add (real_of_num p) (real_of_num q).
 Proof.
   unfold real_of_num, real_add.
   f_equal. rewrite treal_add_of_num. apply fun_ext; intro x.
@@ -414,24 +341,24 @@ Proof. rewrite <- one_morph_R, R_of_real_of_R. reflexivity. Qed.
 
 Definition R_of_N n :=
   match n with
-  | N0 => 0%R
+  | N0 => 0
   | N.pos p => IPR p
   end.
 
 Require Import Coq.micromega.Lra.
 
-Lemma R_of_N_succ n : R_of_N (N.succ n) = (R_of_N n + 1)%R.
+Lemma R_of_N_succ n : R_of_N (N.succ n) = R_of_N n + 1.
 Proof.
   destruct n; simpl. unfold IPR. lra. rewrite Rplus_comm. apply succ_IPR.
 Qed.
 
-Lemma R_of_N_add p q : R_of_N (p + q)%N = (R_of_N p + R_of_N q)%R.
+Lemma R_of_N_add p q : R_of_N (p + q)%N = R_of_N p + R_of_N q.
 Proof.
   destruct p; destruct q; simpl. lra. unfold IPR. lra. unfold IPR. lra.
   apply plus_IPR.
 Qed.
 
-Lemma Npos_succ p : N.pos (Pos.succ p) = N.pos p + 1.
+Lemma Npos_succ p : N.pos (Pos.succ p) = (N.pos p + 1)%N.
 Proof. lia. Qed.
 
 Lemma treal_eq_of_num_add m n :
@@ -474,54 +401,6 @@ Proof. reflexivity. Qed.
 
 Lemma R_of_N1 : R_of_N 1 = 1%R.
 Proof. reflexivity. Qed.
-
-Definition Rpow (r : R) n : R :=
-  Rfunctions.powerRZ r (Z.of_N n).
-
-Lemma real_pow_def : 
-  Rpow = 
-  (@ε ((prod N (prod N (prod N (prod N (prod N (prod N (prod N N))))))) -> R -> N -> R) (fun real_pow' : (prod N (prod N (prod N (prod N (prod N (prod N (prod N N))))))) -> R -> N -> R => forall _24085 : prod N (prod N (prod N (prod N (prod N (prod N (prod N N)))))), (forall x : R, (real_pow' _24085 x (NUMERAL 0%N)) = (R_of_N (NUMERAL (BIT1 0%N)))) /\ (forall x : R, forall n : N, (real_pow' _24085 x (N.succ n)) = (Rmult x (real_pow' _24085 x n)))) (@pair N (prod N (prod N (prod N (prod N (prod N (prod N N)))))) (NUMERAL (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N (prod N (prod N (prod N N))))) (NUMERAL (BIT1 (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N (prod N (prod N N)))) (NUMERAL (BIT1 (BIT0 (BIT0 (BIT0 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N (prod N N))) (NUMERAL (BIT0 (BIT0 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N N)) (NUMERAL (BIT1 (BIT1 (BIT1 (BIT1 (BIT1 (BIT0 (BIT1 0%N)))))))) (@pair N (prod N N) (NUMERAL (BIT0 (BIT0 (BIT0 (BIT0 (BIT1 (BIT1 (BIT1 0%N)))))))) (@pair N N (NUMERAL (BIT1 (BIT1 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 0%N)))))))) (NUMERAL (BIT1 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 (BIT1 0%N)))))))))))))))).
-Proof.
-  cbn.
-  align_ε.
-  { cbn. split. 1: reflexivity.
-    intros x n.
-    unfold Rpow. rewrite <- !N_nat_Z.
-    rewrite <- !Rfunctions.pow_powerRZ.
-    rewrite Nnat.N2Nat.inj_succ. reflexivity.
-  }
-  cbn. intros pow' [h0 hS].
-  ext r n.
-  rewrite <- (Nnat.N2Nat.id n).
-  unfold Rpow. rewrite nat_N_Z.
-  generalize (N.to_nat n) as m. clear n. intro n.
-  rewrite <- Rfunctions.pow_powerRZ.
-  induction n as [| n ih].
-  - cbn. rewrite h0. reflexivity.
-  - rewrite Nnat.Nat2N.inj_succ. cbn.
-    rewrite hS. rewrite ih.
-    reflexivity.
-Qed.
-
-(*Fixpoint Rpower_nat r n : R :=
-  match n with
-  | 0 => 1
-  | S n => r * Rpower_nat r n
-  end.
-
-Lemma real_pow_def : Rpower_nat = (@ε ((prod nat (prod nat (prod nat (prod nat (prod nat (prod nat (prod nat nat))))))) -> R -> nat -> R) (fun real_pow' : (prod nat (prod nat (prod nat (prod nat (prod nat (prod nat (prod nat nat))))))) -> R -> nat -> R => forall _24085 : prod nat (prod nat (prod nat (prod nat (prod nat (prod nat (prod nat nat)))))), (forall x : R, (real_pow' _24085 x (NUMERAL 0)) = (R_of_N (NUMERAL (BIT1 0)))) /\ (forall x : R, forall n : nat, (real_pow' _24085 x (S n)) = (Rmult x (real_pow' _24085 x n)))) (@pair nat (prod nat (prod nat (prod nat (prod nat (prod nat (prod nat nat)))))) (NUMERAL (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 (BIT1 0)))))))) (@pair nat (prod nat (prod nat (prod nat (prod nat (prod nat nat))))) (NUMERAL (BIT1 (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 0)))))))) (@pair nat (prod nat (prod nat (prod nat (prod nat nat)))) (NUMERAL (BIT1 (BIT0 (BIT0 (BIT0 (BIT0 (BIT1 (BIT1 0)))))))) (@pair nat (prod nat (prod nat (prod nat nat))) (NUMERAL (BIT0 (BIT0 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 0)))))))) (@pair nat (prod nat (prod nat nat)) (NUMERAL (BIT1 (BIT1 (BIT1 (BIT1 (BIT1 (BIT0 (BIT1 0)))))))) (@pair nat (prod nat nat) (NUMERAL (BIT0 (BIT0 (BIT0 (BIT0 (BIT1 (BIT1 (BIT1 0)))))))) (@pair nat nat (NUMERAL (BIT1 (BIT1 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 0)))))))) (NUMERAL (BIT1 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 (BIT1 0)))))))))))))))).
-Proof.
-  generalize (@pair nat (prod nat (prod nat (prod nat (prod nat (prod nat (prod nat nat)))))) (NUMERAL (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 (BIT1 0)))))))) (@pair nat (prod nat (prod nat (prod nat (prod nat (prod nat nat))))) (NUMERAL (BIT1 (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 0)))))))) (@pair nat (prod nat (prod nat (prod nat (prod nat nat)))) (NUMERAL (BIT1 (BIT0 (BIT0 (BIT0 (BIT0 (BIT1 (BIT1 0)))))))) (@pair nat (prod nat (prod nat (prod nat nat))) (NUMERAL (BIT0 (BIT0 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 0)))))))) (@pair nat (prod nat (prod nat nat)) (NUMERAL (BIT1 (BIT1 (BIT1 (BIT1 (BIT1 (BIT0 (BIT1 0)))))))) (@pair nat (prod nat nat) (NUMERAL (BIT0 (BIT0 (BIT0 (BIT0 (BIT1 (BIT1 (BIT1 0)))))))) (@pair nat nat (NUMERAL (BIT1 (BIT1 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 0)))))))) (NUMERAL (BIT1 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 (BIT1 0))))))))))))))); generalize (@prod nat (prod nat (prod nat (prod nat (prod nat (prod nat (prod nat nat))))))); intros A a.
-  match goal with [|- _ = ε ?x _] => set (Q := x) end.
-  assert (i : exists q, Q q). exists (fun _ => Rpower_nat). split; simpl; intro x; reflexivity.
-  generalize (ε_spec i a). intros [h0 hs].
-  apply fun_ext; intro x. apply fun_ext; intro y.
-  induction y; simpl. rewrite h0. reflexivity. rewrite hs, IHy. reflexivity.
-Qed.*)
-
-Require Import Coq.Reals.RIneq.
-
-Open Scope R_scope.
 
 Lemma Rnot_le x y : (~ x <= y) = (x > y).
 Proof.
@@ -584,6 +463,31 @@ Proof.
   destruct (Rle_dec x y).
   rewrite <- (is_True (x <= y)) in r. rewrite r, COND_True. reflexivity.
   rewrite <- (is_False (x <= y)) in n. rewrite n, COND_False. reflexivity.
+Qed.
+
+Definition Rpow (r : R) n : R := powerRZ r (Z.of_N n).
+
+Lemma real_pow_def : Rpow = (@ε ((prod N (prod N (prod N (prod N (prod N (prod N (prod N N))))))) -> R -> N -> R) (fun real_pow' : (prod N (prod N (prod N (prod N (prod N (prod N (prod N N))))))) -> R -> N -> R => forall _24085 : prod N (prod N (prod N (prod N (prod N (prod N (prod N N)))))), (forall x : R, (real_pow' _24085 x (NUMERAL 0%N)) = (R_of_N (NUMERAL (BIT1 0%N)))) /\ (forall x : R, forall n : N, (real_pow' _24085 x (N.succ n)) = (Rmult x (real_pow' _24085 x n)))) (@pair N (prod N (prod N (prod N (prod N (prod N (prod N N)))))) (NUMERAL (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N (prod N (prod N (prod N N))))) (NUMERAL (BIT1 (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N (prod N (prod N N)))) (NUMERAL (BIT1 (BIT0 (BIT0 (BIT0 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N (prod N N))) (NUMERAL (BIT0 (BIT0 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N N)) (NUMERAL (BIT1 (BIT1 (BIT1 (BIT1 (BIT1 (BIT0 (BIT1 0%N)))))))) (@pair N (prod N N) (NUMERAL (BIT0 (BIT0 (BIT0 (BIT0 (BIT1 (BIT1 (BIT1 0%N)))))))) (@pair N N (NUMERAL (BIT1 (BIT1 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 0%N)))))))) (NUMERAL (BIT1 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 (BIT1 0%N)))))))))))))))).
+Proof.
+  cbn.
+  align_ε.
+  { cbn. split. 1: reflexivity.
+    intros x n.
+    unfold Rpow. rewrite <- !N_nat_Z.
+    rewrite <- !Rfunctions.pow_powerRZ.
+    rewrite Nnat.N2Nat.inj_succ. reflexivity.
+  }
+  cbn. intros pow' [h0 hS].
+  ext r n.
+  rewrite <- (Nnat.N2Nat.id n).
+  unfold Rpow. rewrite nat_N_Z.
+  generalize (N.to_nat n) as m. clear n. intro n.
+  rewrite <- Rfunctions.pow_powerRZ.
+  induction n as [| n ih].
+  - cbn. rewrite h0. reflexivity.
+  - rewrite Nnat.Nat2N.inj_succ. cbn.
+    rewrite hS. rewrite ih.
+    reflexivity.
 Qed.
 
 (*****************************************************************************)
@@ -693,18 +597,12 @@ Proof.
   intro n. unfold int_of_real. rewrite Z_of_N_succ, R_of_N_succ, up_succ. lia.
 Qed.
 
-Definition Rsgn r :=
-  r / Rabs r.
+Definition Rsgn r := r / Rabs r.
 
-Lemma Rsgn_0 :
-  Rsgn 0 = 0.
-Proof.
-  unfold Rsgn. lra.
-Qed.
+Lemma Rsgn_0 : Rsgn 0 = 0.
+Proof. unfold Rsgn. lra. Qed.
 
-Lemma Rsgn_pos r :
-  r > 0 ->
-  Rsgn r = 1.
+Lemma Rsgn_pos r : r > 0 -> Rsgn r = 1.
 Proof.
   intro h.
   unfold Rsgn.
@@ -713,9 +611,7 @@ Proof.
   reflexivity.
 Qed.
 
-Lemma Rsgn_neg r :
-  r < 0 ->
-  Rsgn r = -1.
+Lemma Rsgn_neg r : r < 0 -> Rsgn r = -1.
 Proof.
   intro h.
   unfold Rsgn.
@@ -725,9 +621,7 @@ Proof.
   reflexivity.
 Qed.
 
-Lemma real_sgn_def : 
-  Rsgn = 
-  (fun _26598 : R => @COND R (Rlt (R_of_N (NUMERAL 0%N)) _26598) (R_of_N (NUMERAL (BIT1 0%N))) (@COND R (Rlt _26598 (R_of_N (NUMERAL 0%N))) (Ropp (R_of_N (NUMERAL (BIT1 0%N)))) (R_of_N (NUMERAL 0%N)))).
+Lemma real_sgn_def : Rsgn = (fun _26598 : R => @COND R (Rlt (R_of_N (NUMERAL 0%N)) _26598) (R_of_N (NUMERAL (BIT1 0%N))) (@COND R (Rlt _26598 (R_of_N (NUMERAL 0%N))) (Ropp (R_of_N (NUMERAL (BIT1 0%N)))) (R_of_N (NUMERAL 0%N)))).
 Proof. 
   unfold Rsgn.
   ext r. cbn.
@@ -737,13 +631,6 @@ Proof.
     + apply Rsgn_neg.
     + intro h'. assert (r = 0) as -> by lra.
       lra.
-Qed.
-
-Lemma integer_def : 
-  integer = 
-  (fun _28715 : R => exists n : N, (Rabs _28715) = (R_of_N n)).
-Proof.
-  reflexivity.
 Qed.
 
 Lemma int_le_def : 
@@ -767,8 +654,7 @@ Proof.
 Qed.
 
 Lemma int_ge_def : 
-  Z.ge = 
-  (fun _28765 : Z => fun _28766 : Z => Rge (IZR _28765) (IZR _28766)).
+  Z.ge = (fun _28765 : Z => fun _28766 : Z => Rge (IZR _28765) (IZR _28766)).
 Proof.
   rewrite real_ge_def.
   ext n m. apply prop_ext.
@@ -777,8 +663,7 @@ Proof.
 Qed.
 
 Lemma int_gt_def : 
-  Z.gt = 
-  (fun _28777 : Z => fun _28778 : Z => Rgt (IZR _28777) (IZR _28778)).
+  Z.gt = (fun _28777 : Z => fun _28778 : Z => Rgt (IZR _28777) (IZR _28778)).
 Proof.
   rewrite real_gt_def.
   ext n m. apply prop_ext.
@@ -787,8 +672,7 @@ Proof.
 Qed.
 
 Lemma int_neg_def : 
-  Z.opp = 
-  (fun _28794 : Z => int_of_real (Ropp (IZR _28794))).
+  Z.opp = (fun _28794 : Z => int_of_real (Ropp (IZR _28794))).
 Proof.
   ext n.
   rewrite <- opp_IZR. rewrite axiom_25.
@@ -796,8 +680,7 @@ Proof.
 Qed.
 
 Lemma int_add_def : 
-  Z.add = 
-  (fun _28803 : Z => fun _28804 : Z => int_of_real (Rplus (IZR _28803) (IZR _28804))).
+  Z.add = (fun _28803 : Z => fun _28804 : Z => int_of_real (Rplus (IZR _28803) (IZR _28804))).
 Proof. 
   apply fun_ext. intro n.
   apply fun_ext. intro m.
@@ -806,8 +689,7 @@ Proof.
 Qed.
 
 Lemma int_sub_def : 
-  Z.sub = 
-  (fun _28835 : Z => fun _28836 : Z => int_of_real (Rminus (IZR _28835) (IZR _28836))).
+  Z.sub = (fun _28835 : Z => fun _28836 : Z => int_of_real (Rminus (IZR _28835) (IZR _28836))).
 Proof.
   ext n m.
   rewrite <- minus_IZR. rewrite axiom_25.
@@ -847,8 +729,7 @@ Proof.
 Qed.
 
 Lemma int_max_def : 
-  Z.max = 
-  (fun _28938 : Z => fun _28939 : Z => int_of_real (Rmax (IZR _28938) (IZR _28939))).
+  Z.max = (fun _28938 : Z => fun _28939 : Z => int_of_real (Rmax (IZR _28938) (IZR _28939))).
 Proof.
   ext n m.
   eapply Rmax_case_strong. all: intro h. all: apply le_IZR in h.
@@ -859,8 +740,7 @@ Proof.
 Qed.
 
 Lemma int_min_def : 
-  Z.min = 
-  (fun _28956 : Z => fun _28957 : Z => int_of_real (Rmin (IZR _28956) (IZR _28957))).
+  Z.min = (fun _28956 : Z => fun _28957 : Z => int_of_real (Rmin (IZR _28956) (IZR _28957))).
 Proof.
   ext n m.
   eapply Rmin_case_strong. all: intro h. all: apply le_IZR in h.
@@ -870,12 +750,10 @@ Proof.
     rewrite axiom_25. reflexivity.
 Qed.
 
-Definition Zpow n m :=
-  (n ^ Z.of_N m)%Z.
+Definition Zpow n m := (n ^ Z.of_N m)%Z.
 
 Lemma int_pow_def : 
-  Zpow = 
-  (fun _28974 : Z => fun _28975 : N => int_of_real (Rpow (IZR _28974) _28975)).
+  Zpow = (fun _28974 : Z => fun _28975 : N => int_of_real (Rpow (IZR _28974) _28975)).
 Proof.
   ext n m.
   rewrite <- (Nnat.N2Nat.id m).
@@ -890,15 +768,14 @@ Proof.
     rewrite mult_IZR. rewrite ih. reflexivity.
 Qed.
 
-Definition Zdiv a b :=
-  (Z.sgn b * (a / Z.abs b))%Z.
+Definition Zdiv a b := (Z.sgn b * (a / Z.abs b))%Z.
+(* = Coq.ZArith.Zeuclid.ZEuclid.div but Coq.ZArith.Zeuclid is deprecated *)
 
-Definition Zrem a b :=
-  (a mod Z.abs b)%Z.
+Definition Zrem a b := (a mod Z.abs b)%Z.
+(* = Coq.ZArith.Zeuclid.ZEuclid.modulo but Coq.ZArith.Zeuclid is deprecated *)
 
 Lemma div_def : 
-  Zdiv = 
-  (@ε ((prod N (prod N N)) -> Z -> Z -> Z) (fun q : (prod N (prod N N)) -> Z -> Z -> Z => forall _29326 : prod N (prod N N), exists r : Z -> Z -> Z, forall m : Z, forall n : Z, @COND Prop (n = (Z_of_N (NUMERAL 0%N))) (((q _29326 m n) = (Z_of_N (NUMERAL 0%N))) /\ ((r m n) = m)) ((Z.le (Z_of_N (NUMERAL 0%N)) (r m n)) /\ ((Z.lt (r m n) (Z.abs n)) /\ (m = (Z.add (Z.mul (q _29326 m n) n) (r m n)))))) (@pair N (prod N N) (NUMERAL (BIT0 (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N N (NUMERAL (BIT1 (BIT0 (BIT0 (BIT1 (BIT0 (BIT1 (BIT1 0%N)))))))) (NUMERAL (BIT0 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 (BIT1 0%N))))))))))).
+  Zdiv = (@ε ((prod N (prod N N)) -> Z -> Z -> Z) (fun q : (prod N (prod N N)) -> Z -> Z -> Z => forall _29326 : prod N (prod N N), exists r : Z -> Z -> Z, forall m : Z, forall n : Z, @COND Prop (n = (Z_of_N (NUMERAL 0%N))) (((q _29326 m n) = (Z_of_N (NUMERAL 0%N))) /\ ((r m n) = m)) ((Z.le (Z_of_N (NUMERAL 0%N)) (r m n)) /\ ((Z.lt (r m n) (Z.abs n)) /\ (m = (Z.add (Z.mul (q _29326 m n) n) (r m n)))))) (@pair N (prod N N) (NUMERAL (BIT0 (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N N (NUMERAL (BIT1 (BIT0 (BIT0 (BIT1 (BIT0 (BIT1 (BIT1 0%N)))))))) (NUMERAL (BIT0 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 (BIT1 0%N))))))))))).
 Proof.
   align_ε.
   { exists Zrem. unfold Zdiv, Zrem. cbn. intros m n.
@@ -926,8 +803,7 @@ Proof.
 Qed.
 
 Lemma rem_def : 
-  Zrem = 
-  (@ε ((prod N (prod N N)) -> Z -> Z -> Z) (fun r : (prod N (prod N N)) -> Z -> Z -> Z => forall _29327 : prod N (prod N N), forall m : Z, forall n : Z, @COND Prop (n = (Z_of_N (NUMERAL 0%N))) (((Zdiv m n) = (Z_of_N (NUMERAL 0%N))) /\ ((r _29327 m n) = m)) ((Z.le (Z_of_N (NUMERAL 0%N)) (r _29327 m n)) /\ ((Z.lt (r _29327 m n) (Z.abs n)) /\ (m = (Z.add (Z.mul (Zdiv m n) n) (r _29327 m n)))))) (@pair N (prod N N) (NUMERAL (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 (BIT1 0%N)))))))) (@pair N N (NUMERAL (BIT1 (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 0%N)))))))) (NUMERAL (BIT1 (BIT0 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 0%N))))))))))).
+  Zrem = (@ε ((prod N (prod N N)) -> Z -> Z -> Z) (fun r : (prod N (prod N N)) -> Z -> Z -> Z => forall _29327 : prod N (prod N N), forall m : Z, forall n : Z, @COND Prop (n = (Z_of_N (NUMERAL 0%N))) (((Zdiv m n) = (Z_of_N (NUMERAL 0%N))) /\ ((r _29327 m n) = m)) ((Z.le (Z_of_N (NUMERAL 0%N)) (r _29327 m n)) /\ ((Z.lt (r _29327 m n) (Z.abs n)) /\ (m = (Z.add (Z.mul (Zdiv m n) n) (r _29327 m n)))))) (@pair N (prod N N) (NUMERAL (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 (BIT1 0%N)))))))) (@pair N N (NUMERAL (BIT1 (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 0%N)))))))) (NUMERAL (BIT1 (BIT0 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 0%N))))))))))).
 Proof.
   align_ε.
   { unfold Zdiv, Zrem. intros m n.
@@ -954,12 +830,16 @@ Proof.
     lia.
 Qed.
 
-Definition Rmod_eq (a b c : R) :=
-  exists k, b - c = IZR k * a.
+Lemma Zdiv_pos a b : (0 < b)%Z -> Zdiv a b = Z.div a b.
+Proof.
+  intro h. unfold Zdiv. rewrite Z.sgn_pos. 2: assumption.
+  rewrite Z.abs_eq. 2: lia. lia.
+Qed.
+
+Definition Rmod_eq (a b c : R) := exists k, b - c = IZR k * a.
 
 Lemma real_mod_def : 
-  Rmod_eq = 
-  (fun _29623 : R => fun _29624 : R => fun _29625 : R => exists q : R, (integer q) /\ ((Rminus _29624 _29625) = (Rmult q _29623))).
+  Rmod_eq = (fun _29623 : R => fun _29624 : R => fun _29625 : R => exists q : R, (integer q) /\ ((Rminus _29624 _29625) = (Rmult q _29623))).
 Proof.
   ext a b c. unfold Rmod_eq. apply prop_ext.
   - intros [k e]. exists (IZR k). split.
@@ -973,49 +853,32 @@ Qed.
 (** TODO Replace by [PreOmega.Z.divide_alt] once Coq 8.19 support is dropped **)
 Lemma divide_alt x y : Z.divide x y -> exists z, y = (x * z)%Z.
 Proof. 
-  intros [z ->]. 
-  exists z. apply Z.mul_comm. 
+  intros [z ->]. exists z. apply Z.mul_comm. 
 Qed.
 
 Lemma int_divides_def : 
-  Z.divide = 
-  (fun _29644 : Z => fun _29645 : Z => exists x : Z, _29645 = (Z.mul _29644 x)).
+  Z.divide = (fun _29644 : Z => fun _29645 : Z => exists x : Z, _29645 = (Z.mul _29644 x)).
 Proof.
   ext a b. apply prop_ext.
   - apply divide_alt.
   - intros [c e]. eapply Znumtheory.Zdivide_intro with c. lia.
 Qed.
 
-Definition Zmod_eq (k a b : Z) :=
-  (k | a - b)%Z.
-
-Lemma int_mod_def : 
-  Zmod_eq = 
-  (fun _29664 : Z => fun _29665 : Z => fun _29666 : Z => Z.divide _29664 (Z.sub _29665 _29666)).
-Proof.
-  reflexivity.
-Qed.
-
-Definition int_coprime '(a,b) :=
-  exists x y, (a * x + b * y = 1)%Z.
+Definition int_coprime '(a,b) := exists x y, (a * x + b * y = 1)%Z.
 
 Lemma int_coprime_def : 
-  int_coprime = 
-  (fun _29691 : prod Z Z => exists x : Z, exists y : Z, (Z.add (Z.mul (@fst Z Z _29691) x) (Z.mul (@snd Z Z _29691) y)) = (Z_of_N (NUMERAL (BIT1 0%N)))).
+  int_coprime = (fun _29691 : prod Z Z => exists x : Z, exists y : Z, (Z.add (Z.mul (@fst Z Z _29691) x) (Z.mul (@snd Z Z _29691) y)) = (Z_of_N (NUMERAL (BIT1 0%N)))).
 Proof.
   ext p. destruct p as [a b].
   cbn. reflexivity.
 Qed.
 
-Definition int_gcd '(a,b) :=
-  Z.gcd a b.
+Definition int_gcd '(a,b) := Z.gcd a b.
 
 Lemma int_gcd_def : 
-  int_gcd = 
-  (@ε ((prod N (prod N (prod N (prod N (prod N (prod N N)))))) -> (prod Z Z) -> Z) (fun d : (prod N (prod N (prod N (prod N (prod N (prod N N)))))) -> (prod Z Z) -> Z => forall _30960 : prod N (prod N (prod N (prod N (prod N (prod N N))))), forall a : Z, forall b : Z, (Z.le (Z_of_N (NUMERAL 0%N)) (d _30960 (@pair Z Z a b))) /\ ((Z.divide (d _30960 (@pair Z Z a b)) a) /\ ((Z.divide (d _30960 (@pair Z Z a b)) b) /\ (exists x : Z, exists y : Z, (d _30960 (@pair Z Z a b)) = (Z.add (Z.mul a x) (Z.mul b y)))))) (@pair N (prod N (prod N (prod N (prod N (prod N N))))) (NUMERAL (BIT1 (BIT0 (BIT0 (BIT1 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N (prod N (prod N N)))) (NUMERAL (BIT0 (BIT1 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N (prod N N))) (NUMERAL (BIT0 (BIT0 (BIT1 (BIT0 (BIT1 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N N)) (NUMERAL (BIT1 (BIT1 (BIT1 (BIT1 (BIT1 (BIT0 (BIT1 0%N)))))))) (@pair N (prod N N) (NUMERAL (BIT1 (BIT1 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N N (NUMERAL (BIT1 (BIT1 (BIT0 (BIT0 (BIT0 (BIT1 (BIT1 0%N)))))))) (NUMERAL (BIT0 (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 0%N))))))))))))))).
+  int_gcd = (@ε ((prod N (prod N (prod N (prod N (prod N (prod N N)))))) -> (prod Z Z) -> Z) (fun d : (prod N (prod N (prod N (prod N (prod N (prod N N)))))) -> (prod Z Z) -> Z => forall _30960 : prod N (prod N (prod N (prod N (prod N (prod N N))))), forall a : Z, forall b : Z, (Z.le (Z_of_N (NUMERAL 0%N)) (d _30960 (@pair Z Z a b))) /\ ((Z.divide (d _30960 (@pair Z Z a b)) a) /\ ((Z.divide (d _30960 (@pair Z Z a b)) b) /\ (exists x : Z, exists y : Z, (d _30960 (@pair Z Z a b)) = (Z.add (Z.mul a x) (Z.mul b y)))))) (@pair N (prod N (prod N (prod N (prod N (prod N N))))) (NUMERAL (BIT1 (BIT0 (BIT0 (BIT1 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N (prod N (prod N N)))) (NUMERAL (BIT0 (BIT1 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N (prod N N))) (NUMERAL (BIT0 (BIT0 (BIT1 (BIT0 (BIT1 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N N)) (NUMERAL (BIT1 (BIT1 (BIT1 (BIT1 (BIT1 (BIT0 (BIT1 0%N)))))))) (@pair N (prod N N) (NUMERAL (BIT1 (BIT1 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N N (NUMERAL (BIT1 (BIT1 (BIT0 (BIT0 (BIT0 (BIT1 (BIT1 0%N)))))))) (NUMERAL (BIT0 (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 0%N))))))))))))))).
 Proof.
-  unfold int_gcd. cbn.
-  align_ε.
+  cbn. align_ε. unfold int_gcd.
   - intros a b. split. 2: split. 3: split.
     + apply Z.gcd_nonneg.
     + apply Z.gcd_divide_l.
@@ -1032,12 +895,10 @@ Proof.
     + apply Z.divide_mul_l. assumption.
 Qed.
 
-Definition int_lcm '(a,b) :=
-  Z.lcm a b.
+Definition int_lcm '(a,b) := Z.lcm a b.
 
 Lemma int_lcm_def : 
-  int_lcm = 
-  (fun _30961 : prod Z Z => @COND Z ((Z.mul (@fst Z Z _30961) (@snd Z Z _30961)) = (Z_of_N (NUMERAL 0%N))) (Z_of_N (NUMERAL 0%N)) (Z.div (Z.abs (Z.mul (@fst Z Z _30961) (@snd Z Z _30961))) (int_gcd (@pair Z Z (@fst Z Z _30961) (@snd Z Z _30961))))).
+  int_lcm = (fun y0 : prod Z Z => @COND Z ((Z.mul (@fst Z Z y0) (@snd Z Z y0)) = (Z_of_N (NUMERAL 0%N))) (Z_of_N (NUMERAL 0%N)) (Zdiv (Z.abs (Z.mul (@fst Z Z y0) (@snd Z Z y0))) (int_gcd (@pair Z Z (@fst Z Z y0) (@snd Z Z y0))))).
 Proof.
   unfold int_lcm, int_gcd. cbn.
   ext p. destruct p as [a b]. cbn.
@@ -1155,6 +1016,8 @@ Proof.
     { pose proof (Z.gcd_divide_r a b) as []. lia. }
     rewrite Z.divide_div_mul_exact in e. 2: assumption. 2: reflexivity.
     rewrite Z.div_same in e. 2: assumption.
+    rewrite Zdiv_pos.
+    2:{ pose proof (Z.gcd_nonneg a b). lia. }
     lia.
 Qed.
 
