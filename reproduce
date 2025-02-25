@@ -4,9 +4,9 @@ set -e # to exit as soon as there is an error
 
 hollight_version=3.0.0 # for dependencies
 hollight_commit=28e4aed
-hol2dk_commit=3a265dd
-lambdapi_commit=08d0f00d
-coq_hollight_real_commit=821eda1
+hol2dk_commit=cf8e96e
+lambdapi_commit=48053844
+coq_hollight_real_commit=9b5813a
 
 opam_version=2.2.1
 dune_version=3.17.1
