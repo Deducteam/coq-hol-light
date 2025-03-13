@@ -206,7 +206,6 @@ stage 9 patch_hollight
 stage 10 dump_proofs
 stage 11 config_output_dir
 stage 12 create_and_check_opam_library
-exit
 stage 13 compare_opam_files
 stage 14 translate_proofs
 stage 15 check_proofs
