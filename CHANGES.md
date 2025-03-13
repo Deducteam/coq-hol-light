@@ -3,9 +3,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## Unreleased
+## 3.1.0 (2025-03-13)
 
-- add HOL-Light library Multivariate/make_complex.ml (~20,000 theorems)
+- add mappings for various integer functions and predicates (Théo Winterhalter)
+- add mapping for int_lcm (Alessio Coltellacci and Théo Winterhalter)
+
+## 3.0.0 (2025-01-21)
+
+- add HOL-Light library Multivariate/make_complex.ml (~17,500 theorems)
 - rename HOLLight.v into With_N.v
 - use coq-hol-light-real-with-N
 
