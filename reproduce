@@ -4,12 +4,12 @@ set -e # to exit as soon as there is an error
 
 hollight_version=3.0.0 # for dependencies
 hollight_commit=28e4aed
-hol2dk_commit=3a265dd
-lambdapi_commit=08d0f00d
-coq_hollight_real_commit=821eda1
+hol2dk_commit=abf12e1
+lambdapi_commit=eeb280b9
+coq_hollight_real_commit=ea7bd54
 
 opam_version=2.2.1
-dune_version=3.17.1
+dune_version=3.17.2
 ocaml_version=5.2.1
 camlp5_version=8.03.01
 coq_version=8.20.1
@@ -110,7 +110,7 @@ config_output_dir() {
     mkdir -p output
     cd output
     if test -f Makefile; then make $jobs clean-all; fi
-    hol2dk config $hollight_file $root_path Coq.NArith.BinNat Coq.Reals.Reals HOLLight_Real_With_N.mappings ../../With_N.v ../../With_N.lp ../../With_N.mk
+    hol2dk config $hollight_file $root_path Coq.NArith.BinNat Coq.Reals.Reals HOLLight_Real_With_N.mappings ../../mappings.v ../../mappings.lp
     cd ..
 }
     
@@ -132,12 +132,13 @@ check_proofs() {
     cd ..
 }
 
-remove_empty_modules() {
+simplify_file() {
     sed -e "s/${base}_//g" \
         -e "/^Require Import ${root_path}\.theory_hol\.$/d" \
         -e "/^Require Import ${root_path}\.types\.$/d" \
         -e "/^Require Import ${root_path}\.axioms\.$/d" \
         -e "/^Axiom thm_HAS_INTEGRAL_TWIZZLE_INTERVAL /d" \
+        -e 's/NUMERAL //g' \
         $1
 }
 
@@ -145,14 +146,14 @@ create_and_check_opam_library() {
     line
     echo create opam library ...
     cd output
-    make opam
+    make $jobs opam
     cd ..
     mkdir -p opam
     cd opam
-    cp ../../Makefile ../../With_N.v .
-    remove_empty_modules ../output/${base}_terms.v > terms.v
-    remove_empty_modules ../output/${base}_opam.v > theorems.v
-    make
+    cp ../../Makefile ../../mappings.v .
+    simplify_file ../output/${base}_terms.v > terms.v
+    simplify_file ../output/${base}_opam.v > theorems.v
+    make $jobs
     cd ..
 }
 
