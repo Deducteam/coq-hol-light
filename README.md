@@ -75,3 +75,7 @@ opam install coq-hol-light
 Require Import HOLLight.theorems.
 Check thm_DIV_DIV.
 ```
+
+**Bibliography**
+
+- [Translating HOL-Light proofs to Coq](https://doi.org/10.29007/6k4x), Frédéric Blanqui, 25th International Conference on Logic for Programming, Artificial Intelligence and Reasoning (LPAR), 2024.
