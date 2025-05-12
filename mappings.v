@@ -112,10 +112,10 @@ Proof. exact eq_R_struct. Qed.
 (* Proof that real is a fourcolor.model of real numbers. *)
 (*****************************************************************************)
 
-Require Import HOLLight_Real_With_N.terms.
+Require Import HOLLight_Real_With_N.terms Coq.NArith.BinNat.
 
 Lemma real_add_of_num p q :
-  real_of_num (p + q)%N = real_add (real_of_num p) (real_of_num q).
+  real_of_num (N.add p q) = real_add (real_of_num p) (real_of_num q).
 Proof.
   unfold real_of_num, real_add.
   f_equal. rewrite treal_add_of_num. apply fun_ext; intro x.
@@ -473,14 +473,14 @@ Proof.
   align_ε.
   { cbn. split. 1: reflexivity.
     intros x n.
-    unfold Rpow. rewrite <- !N_nat_Z.
+    unfold Rpow. rewrite <- !Znat.N_nat_Z.
     rewrite <- !Rfunctions.pow_powerRZ.
     rewrite Nnat.N2Nat.inj_succ. reflexivity.
   }
   cbn. intros pow' [h0 hS].
   ext r n.
   rewrite <- (Nnat.N2Nat.id n).
-  unfold Rpow. rewrite nat_N_Z.
+  unfold Rpow. rewrite Znat.nat_N_Z.
   generalize (N.to_nat n) as m. clear n. intro n.
   rewrite <- Rfunctions.pow_powerRZ.
   induction n as [| n ih].
@@ -762,12 +762,12 @@ Proof.
   rewrite <- (Nnat.N2Nat.id m).
   generalize (N.to_nat m) as k. clear m. intro m.
   unfold Zpow, Rpow.
-  rewrite nat_N_Z.
+  rewrite Znat.nat_N_Z.
   rewrite <- Rfunctions.pow_powerRZ.
   rewrite <- axiom_25 at 1. f_equal.
   induction m as [| m ih].
   - cbn. reflexivity.
-  - rewrite Nat2Z.inj_succ. rewrite Z.pow_succ_r. 2: lia.
+  - rewrite Znat.Nat2Z.inj_succ. rewrite Z.pow_succ_r. 2: lia.
     rewrite mult_IZR. rewrite ih. reflexivity.
 Qed.
 
@@ -1783,3 +1783,5 @@ Proof. intros A a. apply mk_dest. Qed.
 
 Lemma axiom_54 : forall {N' : Type'} (r : N -> Prop), ((fun s : N -> Prop => @SUBSET N s (dotdot (NUMERAL (BIT1 0%N)) (@dimindex N' (@UNIV N')))) r) = ((@dest_multivector N' (@mk_multivector N' r)) = r).
 Proof. intros A r. apply dest_mk. Qed.
+
+Close Scope R_scope.
