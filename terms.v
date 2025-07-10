@@ -1,4 +1,4 @@
-Require Import Coq.NArith.BinNat Coq.Reals.Reals HOLLight_Real_With_N.mappings HOLLight.mappings.
+Require Import Stdlib.NArith.BinNat Stdlib.Reals.Reals HOLLight_Real_With_N.mappings HOLLight.mappings.
 Definition o {A B C : Type'} : (B -> C) -> (A -> B) -> A -> C := fun f : B -> C => fun g : A -> B => fun x : A => f (g x).
 Lemma o_def {A B C : Type'} : (@o A B C) = (fun f : B -> C => fun g : A -> B => fun x : A => f (g x)).
 Proof. exact (eq_refl (@o A B C)). Qed.
