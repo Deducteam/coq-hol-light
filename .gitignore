@@ -1,9 +1,9 @@
 _CoqProject
-Makefile.coq
-Makefile.coq.conf
+rocq.mk
+rocq.mk.conf
 *.vo*
 *.glob
 .*.aux
 .lia.cache
 .nia.cache
-.Makefile.coq.d
+.rocq.mk.d

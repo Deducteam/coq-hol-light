@@ -3,19 +3,19 @@ LIBNAME=HOLLight
 .SUFFIXES:
 
 .PHONY: default
-default: Makefile.coq
-	$(MAKE) -f Makefile.coq
+default: rocq.mk
+	$(MAKE) -f rocq.mk
 
-Makefile.coq: _CoqProject
-	coq_makefile -f _CoqProject -o $@
+rocq.mk: _CoqProject
+	rocq makefile -f _CoqProject -o $@
 
 _CoqProject:
 	echo "-R . $(LIBNAME) `ls *.v`" > $@
 
 .PHONY: clean
-clean: Makefile.coq
-	$(MAKE) -f Makefile.coq $@
-	rm -f _CoqProject Makefile.coq Makefile.coq.conf
+clean: rocq.mk
+	$(MAKE) -f rocq.mk $@
+	rm -f _CoqProject rocq.mk rocq.mk.conf
 
 %:
-	$(MAKE) -f Makefile.coq $@
+	$(MAKE) -f rocq.mk $@
