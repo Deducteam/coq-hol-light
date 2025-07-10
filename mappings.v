@@ -416,8 +416,6 @@ Proof.
   destruct (Rcase_abs r) ; ifp_intro ; try reflexivity ; lra.
 Qed.
 
-Print real_abs_def.
-
 Lemma real_div_def : Rdiv = (fun y0 : R => fun y1 : R => Rmult y0 (Rinv y1)).
 Proof.
   apply fun_ext; intro x; apply fun_ext; intro y. reflexivity.
