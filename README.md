@@ -1,7 +1,7 @@
-HOL-Light libraries in Coq
---------------------------
+HOL-Light libraries in Rocq
+---------------------------
 
-This [Coq](https://coq.inria.fr/) library contains an automatic translation of the [HOL-Light](https://github.com/jrh13/hol-light) library [Multivariate/make_complex.ml](https://github.com/jrh13/hol-light/blob/master/Multivariate/make_complex.ml) with various HOL-Light types and functions [mapped](https://github.com/Deducteam/coq-hol-light/blob/main/mappings.lp) to the corresponding types and functions of the Coq standard library so that, for instance, a HOL-Light theorem on HOL-Light real numbers is translated to a Coq theorem on Coq real numbers. The provided theorems can therefore be readily used within other Coq developments based on the Coq standard library. More types and functions need to be aligned though (see below how to contribute). The translation has been done using [hol2dk](https://github.com/Deducteam/hol2dk) to extract and translate HOL-Light proofs to Lambdapi files, and [lambdapi](https://github.com/Deducteam/lambdapi) to translate Lambdapi files to Coq files.
+This [Rocq](https://coq.inria.fr/) library contains an automatic translation of the [HOL-Light](https://github.com/jrh13/hol-light) library [Multivariate/make_complex.ml](https://github.com/jrh13/hol-light/blob/master/Multivariate/make_complex.ml) with various HOL-Light types and functions [mapped](https://github.com/Deducteam/coq-hol-light/blob/main/mappings.lp) to the corresponding types and functions of the Rocq standard library so that, for instance, a HOL-Light theorem on HOL-Light real numbers is translated to a Rocq theorem on Rocq real numbers. The provided theorems can therefore be readily used within other Rocq developments based on the Rocq standard library. More types and functions need to be aligned though (see below how to contribute). The translation has been done using [hol2dk](https://github.com/Deducteam/hol2dk) to extract and translate HOL-Light proofs to Lambdapi files, and [lambdapi](https://github.com/Deducteam/lambdapi) to translate Lambdapi files to Rocq files.
 
 It contains more than 20,000 theorems on arithmetic, wellfounded relations,
 lists, real numbers, integers, basic set theory, permutations, group
@@ -24,7 +24,7 @@ Your help is welcome to align more functions!
 
 **How to contribute?**
 
-You can easily contribute by proving the correctness of more mappings in Coq:
+You can easily contribute by proving the correctness of more mappings in Rocq:
 
 - Look in [terms.v](https://github.com/Deducteam/coq-hol-light/blob/main/terms.v) for the definition of a function symbol, say f, that you want to replace; note that it is followed by a lemma f_DEF stating what f is equal to.
 
@@ -32,7 +32,7 @@ You can easily contribute by proving the correctness of more mappings in Coq:
 
 - Create a [pull request](https://github.com/Deducteam/coq-hol-light/pulls).
 
-You can also propose to change the mapping of some type in [mappings.v](https://github.com/Deducteam/coq-hol-light/blob/main/mappings.v). Every HOL-Light type `A` is axiomatized as being isomorphic to the subset of elements `x` of some already defined type `B` that satisfies some property `p:B->Prop`. `A` can always be mapped to the Coq type `{x:B|p(x)}` (see [mappings.v](https://github.com/Deducteam/coq-hol-light-real-with-nat/blob/main/mappings.v)) but it is possible to map it to some more convenient type `A'` by defining two functions:
+You can also propose to change the mapping of some type in [mappings.v](https://github.com/Deducteam/coq-hol-light/blob/main/mappings.v). Every HOL-Light type `A` is axiomatized as being isomorphic to the subset of elements `x` of some already defined type `B` that satisfies some property `p:B->Prop`. `A` can always be mapped to the Rocq type `{x:B|p(x)}` (see [mappings.v](https://github.com/Deducteam/coq-hol-light-real-with-nat/blob/main/mappings.v)) but it is possible to map it to some more convenient type `A'` by defining two functions:
 
 - `mk:B->A'`
 
@@ -50,7 +50,7 @@ Note that the mappings of functions on natural numbers and lists are proved in [
 
 **Axioms used**
 
-As HOL-Light is based on classical higher-order logic with choice, this library uses the following standard set of axioms in Coq:
+As HOL-Light is based on classical higher-order logic with choice, this library uses the following standard set of axioms in Rocq:
 
 ```
 Axiom classic : forall P:Prop, P \/ ~ P.
@@ -65,11 +65,11 @@ Axiom proof_irrelevance : forall (P:Prop) (p1 p2:P), p1 = p2.
 Dependencies: [coq-hol-light-real-with-N](https://github.com/Deducteam/coq-hol-light-real-with-N/), [coq-fourcolor-reals](https://github.com/coq-community/fourcolor)
 
 ```
-opam repo add coq-released https://coq.inria.fr/opam/released
+opam repo add rocq-released https://rocq-prover.org/opam/released
 opam install coq-hol-light
 ```
 
-**Usage in a Coq file**
+**Usage in a Rocq file**
 
 ```
 Require Import HOLLight.theorems.
