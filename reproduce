@@ -4,15 +4,15 @@ set -e # to exit as soon as there is an error
 
 hollight_version=3.0.0 # for dependencies
 hollight_commit=28e4aed
-hol2dk_commit=abf12e1
+hol2dk_commit=5390465
 lambdapi_commit=eeb280b9
-coq_hollight_real_commit=ea7bd54
+coq_hollight_real_commit=ccbeb9d
+ocaml_version=5.3.0
+rocq_version=9.0.0
 
-opam_version=2.2.1
-dune_version=3.17.2
-ocaml_version=5.2.1
-camlp5_version=8.03.01
-coq_version=8.20.1
+opam_version=2.3.0
+dune_version=3.19.1
+camlp5_version=8.03.05
 
 hollight_file=Multivariate/make_complex.ml
 base=`basename $hollight_file .ml`
@@ -55,16 +55,16 @@ install_lambdapi() {
     cd ..
 }
 
-install_coq() {
+install_rocq() {
     line
-    echo install coq ...
-    opam repo add coq-released https://coq.inria.fr/opam/released
-    opam install -y coq.$coq_version
+    echo install rocq ...
+    opam install -y rocq-prover.$rocq_version
 }
 
 install_deps() {
     line
     echo install dependencies ...
+    opam repo add rocq-released https://rocq-prover.org/opam/released
     opam install -y --deps-only ..
 }
 
@@ -110,17 +110,19 @@ config_output_dir() {
     mkdir -p output
     cd output
     if test -f Makefile; then make $jobs clean-all; fi
-    hol2dk config $hollight_file $root_path Coq.NArith.BinNat Coq.Reals.Reals HOLLight_Real_With_N.mappings ../../mappings.v ../../mappings.lp
+    hol2dk config $hollight_file $root_path Stdlib.NArith.BinNat Stdlib.Reals.Reals HOLLight_Real_With_N.mappings ../../mappings.v ../../mappings.lp
     cd ..
 }
     
 translate_proofs() {
     line
-    echo translate HOL-Light proofs to lambdapi and coq ...
+    echo translate HOL-Light proofs to lambdapi and rocq ...
     cd output
     make split
     make $jobs lp
     make $jobs v
+    make $jobs spec
+    make $jobs rm-empty-deps
     cd ..
 }
 
@@ -132,7 +134,7 @@ check_proofs() {
     cd ..
 }
 
-simplify_file() {
+remove_empty_modules() {
     sed -e "s/${base}_//g" \
         -e "/^Require Import ${root_path}\.theory_hol\.$/d" \
         -e "/^Require Import ${root_path}\.types\.$/d" \
@@ -151,8 +153,9 @@ create_and_check_opam_library() {
     mkdir -p opam
     cd opam
     cp ../../Makefile ../../mappings.v .
-    simplify_file ../output/${base}_terms.v > terms.v
-    simplify_file ../output/${base}_opam.v > theorems.v
+    remove_empty_modules ../output/${base}_terms.v > terms.v
+    remove_empty_modules ../output/${base}_opam.v > theorems.v
+    sed -i -e 's/NUMERAL //g' -e 's/(N0)/N0/g' terms.v theorems.v
     make $jobs
     cd ..
 }
@@ -197,7 +200,7 @@ stage 1 create_opam_switch
 eval `opam env`
 stage 2 install_hollight_deps
 stage 3 install_lambdapi
-stage 4 install_coq
+stage 4 install_rocq
 stage 5 install_deps
 stage 6 install_coq_hollight_real
 stage 7 install_hol2dk
@@ -207,5 +210,6 @@ stage 10 dump_proofs
 stage 11 config_output_dir
 stage 12 create_and_check_opam_library
 stage 13 compare_opam_files
+exit
 stage 14 translate_proofs
 stage 15 check_proofs
