@@ -210,6 +210,5 @@ stage 10 dump_proofs
 stage 11 config_output_dir
 stage 12 create_and_check_opam_library
 stage 13 compare_opam_files
-exit
 stage 14 translate_proofs
 stage 15 check_proofs
