@@ -6,8 +6,9 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
   push:
-    paths-ignore:
-      - '**/*.md'
+    paths:
+      - '*.v'
+      - 'Makefile'
   workflow_dispatch:
 
 jobs:
@@ -16,10 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        coq_version:
-          - dev
-          - '8.20'
-          - '8.19'
+        coq_version: [dev, '9.0']
       fail-fast: false
     steps:
       - uses: actions/checkout@v4

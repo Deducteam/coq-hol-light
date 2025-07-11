@@ -13,7 +13,7 @@ authors: ["Frédéric Blanqui"]
 license: "CeCILL-2.1"
 depends: [
   "rocq-prover" {>= "9.0"}
-  "coq-hol-light-real-with-N" {>= "1.2.0"}
+  "coq-hol-light-real-with-N" {>= "2.0.0"}
   "coq-fourcolor-reals" {>= "1.4.0"}
 ]
 build: [make "-j%{jobs}%"]
@@ -21,9 +21,8 @@ install: [make "install"]
 tags: [
   "logpath:HOLLight"
   "date:2025-03-13"
-  "category:Math/Arith/Misc"
-  "category:Math/Arith/Real Numbers"
-  "category:Math/Real Numbers"
+  "category:Mathematics/Arithmetic and Number Theory/Miscellaneous"
+  "category:Mathematics/Real Numbers"
   "category:Mathematics/Real Calculus and Topology"
   "keyword:HOL-Light"
   "keyword:list"
