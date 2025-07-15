@@ -19,66 +19,123 @@ base=`basename $hollight_file .ml`
 root_path=HOLLight
 jobs='-j32'
 
-line() { echo '------------------------------------------------------------'; }
+usage() {
+    echo "usage: `basename $0` [STAGE_NUMBER]"
+    echo
+    echo 'do stages from STAGE_NUMBER or last failing stage'
+    echo
+    echo 'options:'
+    echo '  -h|--help: print help'
+    echo '  -y: do not ask for user input, proceed automatically'
+    echo
+    echo 'stages:'
+    grep '^stage ' $0 | sed -e 's/^stage/ /'
+}
+
+parse_args() {
+    if test $# -gt 0
+    then
+        case $1 in
+            -h|--help) usage; exit 0;;
+            -y) do_not_ask=1; shift; parse_args $*;;
+            *)
+                if test $1 -le 0 -o $1 -gt 15
+                then
+                    echo 'error: invalid stage number'
+                    usage
+                    exit 1
+                else
+                    if test $# -gt 1
+                    then
+                        echo 'error: too many arguments'
+                        usage
+                        exit 1
+                    fi
+                fi;;
+        esac
+    fi
+}
+
+parse_args $*
+
+# usage: ask text
+ask() {
+    if test "$do_not_ask" != 1
+    then
+        read -p "$1 (y/n)? " answer
+        echo $answer
+    fi
+}
 
 mkdir -p tmp
 cd tmp
 
 #usage: checkout_commit url commit
 checkout_commit() {
-    line
     d=`basename $1 .git`
-    echo install $d ...
-    git clone $1
-    cd $d
-    git checkout $2
-    cd ..
+    if test ! -d "$d"
+    then
+        echo git clone $1 ...
+        git clone $1
+        cd $d
+        echo git checkout $2 ...
+        git checkout $2
+        cd ..
+    fi
+}
+
+#usage: install_commit url commit
+install_commit() {
+    checkout_commit $*
+    if test `git branch | grep reproduce | wc -l` -gt 0
+    then
+        d=`basename $1 .git`
+        cd $d
+        git checkout -b reproduce
+        echo opam install $d ...
+        opam install -y .
+        cd ..
+    fi
 }
 
 create_opam_switch() {
-    line
-    echo create opam switch ...
-    opam switch create . $ocaml_version
+    s=`opam switch show`
+    c=`pwd`
+    if test "$s" != "$c"
+    then
+        echo opam switch create $c ...
+        opam switch create . $ocaml_version
+    fi
 }
 
 install_hollight_deps() {
-    line
     echo install HOL-Light dependencies ...
     opam install -y --deps-only hol_light.$hollight_version
 }
 
 install_lambdapi() {
-    checkout_commit https://github.com/Deducteam/lambdapi.git $lambdapi_commit
-    cd lambdapi
-    git checkout -b reproduce
-    opam install -y .
-    cd ..
+    install_commit https://github.com/Deducteam/lambdapi.git $lambdapi_commit
 }
 
 install_rocq() {
-    line
     echo install rocq ...
     opam install -y rocq-prover.$rocq_version
 }
 
 install_deps() {
-    line
-    echo install dependencies ...
+    echo install coq-hol-light dependencies ...
     opam repo add rocq-released https://rocq-prover.org/opam/released
     opam install -y --deps-only ..
 }
 
 install_coq_hollight_real() {
-    checkout_commit https://github.com/Deducteam/coq-hol-light-real-with-N $coq_hollight_real_commit
-    cd coq-hol-light-real-with-N
-    git checkout -b reproduce
-    opam install -y .
-    cd ..
+    install_commit https://github.com/Deducteam/coq-hol-light-real-with-N $coq_hollight_real_commit
 }
 
 install_hol2dk() {
     checkout_commit https://github.com/Deducteam/hol2dk.git $hol2dk_commit
     cd hol2dk
+    echo install hol2dk ...
     dune build && dune install
     cd ..
 }
@@ -86,52 +143,63 @@ install_hol2dk() {
 install_hollight() {
     checkout_commit https://github.com/jrh13/hol-light.git $hollight_commit
     cd hol-light
+    echo configure hol-light ...
     make
     cd ..
 }
 
 patch_hollight() {
-    line
-    echo patch hol-light ...
-    hol2dk patch
+    if test ! -f hol-light/fusion-bak.ml
+    then
+        echo patch hol-light ...
+        hol2dk patch
+    fi
 }
 
 dump_proofs() {
-    line
-    echo dump hol-light proofs ...
-    cd hol-light
-    hol2dk dump-simp $hollight_file
-    cd ..
+    if test ! -f hol-light/$hollight_file
+    then
+        echo dump hol-light proofs ...
+        cd hol-light
+        hol2dk dump-simp $hollight_file
+        cd ..
+    fi
 }
 
 config_output_dir() {
-    line
-    echo configure output directory ...
-    mkdir -p output
-    cd output
-    if test -f Makefile; then make $jobs clean-all; fi
-    hol2dk config $hollight_file $root_path Stdlib.NArith.BinNat Stdlib.Reals.Reals HOLLight_Real_With_N.mappings ../../mappings.v ../../mappings.lp
-    cd ..
+    if test ! -d output
+    then
+        echo configure output directory ...
+        mkdir -p output
+        cd output
+        if test -f Makefile; then make $jobs clean-all; fi
+        hol2dk config $hollight_file $root_path Stdlib.NArith.BinNat Stdlib.Reals.Reals HOLLight_Real_With_N.mappings ../../mappings.v ../../mappings.lp
+        cd ..
+    fi
 }
     
 translate_proofs() {
-    line
-    echo translate HOL-Light proofs to lambdapi and rocq ...
-    cd output
-    make split
-    make $jobs lp
-    make $jobs v
-    make $jobs spec
-    make $jobs rm-empty-deps
-    cd ..
+    if test "`ask 'translate proofs'`" = 'y'
+    then
+        echo translate HOL-Light proofs to lambdapi and rocq ...
+        cd output
+        make split
+        make $jobs lp
+        make $jobs v
+        make $jobs spec
+        make $jobs rm-empty-deps
+        cd ..
+    fi
 }
 
 check_proofs() {
-    line
-    echo check proofs ...
-    cd output
-    make $jobs -k vo
-    cd ..
+    if test "`ask 'check proofs'`" = 'y'
+    then
+        echo check proofs ...
+        cd output
+        make $jobs -k vo
+        cd ..
+    fi
 }
 
 remove_empty_modules() {
@@ -145,7 +213,6 @@ remove_empty_modules() {
 }
 
 create_and_check_opam_library() {
-    line
     echo create opam library ...
     cd output
     make $jobs opam
@@ -161,7 +228,6 @@ create_and_check_opam_library() {
 }
 
 compare_opam_file() {
-    line
     echo compare $1 ...
     diff ../$1 opam/$1
 }
@@ -186,6 +252,8 @@ stage() {
     fi
     if test $i -eq $1
     then
+        echo '------------------------------------------------------------'
+        echo stage $*
         $2
         echo $1 > STAGE
     fi
@@ -193,7 +261,7 @@ stage() {
 
 if test -n "$1"
 then
-    expr $1 - 1 > STAGE
+    echo `expr $1 - 1` > STAGE
 fi
 
 stage 1 create_opam_switch
