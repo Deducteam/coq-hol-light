@@ -186,7 +186,7 @@ translate_proofs() {
         make split
         make $jobs lp
         make $jobs v
-        make $jobs spec
+        make $jobs merge-spec-files
         make $jobs rm-empty-deps
         cd ..
     fi
