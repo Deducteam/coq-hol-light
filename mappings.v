@@ -460,25 +460,9 @@ Definition Rpow (r : R) n : R := powerRZ r (Z.of_N n).
 
 Lemma real_pow_def : Rpow = (@ε ((prod N (prod N (prod N (prod N (prod N (prod N (prod N N))))))) -> R -> N -> R) (fun real_pow' : (prod N (prod N (prod N (prod N (prod N (prod N (prod N N))))))) -> R -> N -> R => forall _24085 : prod N (prod N (prod N (prod N (prod N (prod N (prod N N)))))), (forall x : R, (real_pow' _24085 x (NUMERAL 0%N)) = (R_of_N (NUMERAL (BIT1 0%N)))) /\ (forall x : R, forall n : N, (real_pow' _24085 x (N.succ n)) = (Rmult x (real_pow' _24085 x n)))) (@pair N (prod N (prod N (prod N (prod N (prod N (prod N N)))))) (NUMERAL (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N (prod N (prod N (prod N N))))) (NUMERAL (BIT1 (BIT0 (BIT1 (BIT0 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N (prod N (prod N N)))) (NUMERAL (BIT1 (BIT0 (BIT0 (BIT0 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N (prod N N))) (NUMERAL (BIT0 (BIT0 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 0%N)))))))) (@pair N (prod N (prod N N)) (NUMERAL (BIT1 (BIT1 (BIT1 (BIT1 (BIT1 (BIT0 (BIT1 0%N)))))))) (@pair N (prod N N) (NUMERAL (BIT0 (BIT0 (BIT0 (BIT0 (BIT1 (BIT1 (BIT1 0%N)))))))) (@pair N N (NUMERAL (BIT1 (BIT1 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 0%N)))))))) (NUMERAL (BIT1 (BIT1 (BIT1 (BIT0 (BIT1 (BIT1 (BIT1 0%N)))))))))))))))).
 Proof.
-  cbn.
-  align_ε.
-  { cbn. split. 1: reflexivity.
-    intros x n.
-    unfold Rpow. rewrite <- !Znat.N_nat_Z.
-    rewrite <- !Rfunctions.pow_powerRZ.
-    rewrite Nnat.N2Nat.inj_succ. reflexivity.
-  }
-  cbn. intros pow' [h0 hS].
-  ext r n.
-  rewrite <- (Nnat.N2Nat.id n).
-  unfold Rpow. rewrite Znat.nat_N_Z.
-  generalize (N.to_nat n) as m. clear n. intro n.
-  rewrite <- Rfunctions.pow_powerRZ.
-  induction n as [| n ih].
-  - cbn. rewrite h0. reflexivity.
-  - rewrite Nnat.Nat2N.inj_succ. cbn.
-    rewrite hS. rewrite ih.
-    reflexivity.
+  N_rec_align.
+  intros x n. unfold Rpow. rewrite <- !Znat.N_nat_Z.
+  rewrite <- !Rfunctions.pow_powerRZ, Nnat.N2Nat.inj_succ. reflexivity.
 Qed.
 
 Definition Rsgn r := r / Rabs r.
@@ -784,7 +768,7 @@ Proof.
       + apply Z.mod_pos_bound. assumption.
       + pose proof (Z.div_mod m (Z.abs n)). lia.
   }
-  cbn. intros div' [rem h].
+  cbn. intros div' _ [rem h].
   ext m n. specialize (h m n).
   eapply ifp_elim with (1 := h) ; clear.
   - unfold Zdiv. intros -> [-> e].
@@ -812,7 +796,7 @@ Proof.
       + apply Z.mod_pos_bound. assumption.
       + pose proof (Z.div_mod m (Z.abs n)). lia.
   }
-  cbn. intros rem' h.
+  cbn. intros rem' _ h.
   ext m n. specialize (h m n).
   eapply ifp_elim with (1 := h) ; clear.
   - unfold Zdiv, Zrem. intros -> [e ->].
@@ -872,7 +856,7 @@ Proof.
     + apply Z.gcd_divide_r.
     + pose proof (Z.gcd_bezout a b (Z.gcd a b) eq_refl) as [x [y h]].
       exists x, y. lia.
-  - intros gcd' h.
+  - intros gcd' _ h.
     ext p. destruct p as [a b].
     specialize (h a b) as [hnn [hdl [hdr [x [y e]]]]].
     apply Z.gcd_unique. 1-3: assumption.
