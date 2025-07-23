@@ -209,6 +209,8 @@ builtin "BOTTOM" ≔ BOTTOM;
 builtin "BOTTOM_def" ≔ BOTTOM_def;
 builtin "CONSTR" ≔ CONSTR;
 builtin "CONSTR_def" ≔ CONSTR_def;
+builtin "FCONS" ≔ FCONS;
+builtin "FCONS_def" ≔ FCONS_def;
 
 // option
 builtin "option" ≔ option;
@@ -256,8 +258,8 @@ builtin "List.Forall" ≔ ALL;
 builtin "ALL_def" ≔ ALL_def;
 builtin "List.ForallOrdPairs" ≔ PAIRWISE;
 builtin "PAIRWISE_def" ≔ PAIRWISE_def;
-//builtin "FILTER" ≔ FILTER;
-//builtin "FILTER_def" ≔ FILTER_def;
+builtin "FILTER" ≔ FILTER;
+builtin "FILTER_def" ≔ FILTER_def;
 builtin "List.In" ≔ MEM;
 builtin "MEM_def" ≔ MEM_def;
 builtin "repeatN" ≔ REPLICATE;
