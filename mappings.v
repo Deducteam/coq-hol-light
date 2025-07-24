@@ -1463,36 +1463,30 @@ Lemma axiom_36 : forall {A B : Type'} (r : N), ((fun x : N => @IN N x (dotdot (N
 Proof. intros A r. apply dest_mk. Qed.
 
 (*****************************************************************************)
-(* Mapping of a subtype of recspace (non-recursive inductive type definition) *)
+(* A type equal to A itself *)
 (*****************************************************************************)
 
 Section non_recursive_inductive_type.
 
   Variable A : Type'.
 
-  Definition nr_constr (a:A) : recspace A := CONSTR 0 a (fun n => BOTTOM).
+  Definition nr_dest (a:A) : recspace A := CONSTR 0 a Fnil.
 
-  Definition nr_pred (r : recspace A) := exists a, r = nr_constr a.
+  Definition nr_pred (r : recspace A) := exists a, r = nr_dest a.
 
-  Lemma nr_pred1 : nr_pred (nr_constr (el A)).
-  Proof. exists (el A). reflexivity. Qed.
+  Definition nr_mk := finv nr_dest.
 
-  Definition nr_type := @subtype (recspace A) _ _ nr_pred1.
-
-  Definition nr_mk : recspace A -> nr_type := @mk (recspace A) _ _ nr_pred1.
-
-  Definition nr_dest : nr_type -> recspace A := @dest (recspace A) _ _ nr_pred1.
-
-  Lemma nr_mk_dest : forall a : nr_type, (nr_mk (nr_dest a)) = a.
-  Proof. intro a. apply mk_dest. Qed.
+  Lemma nr_mk_dest : forall a : A, (nr_mk (nr_dest a)) = a.
+  Proof.
+    _mk_dest_rec. intros a a' H. now inversion H.
+  Qed.
 
   Lemma nr_dest_mk : forall r : recspace A, (forall P : recspace A -> Prop, (forall r' : recspace A, nr_pred r' -> P r') -> P r) = (nr_dest (nr_mk r) = r).
   Proof.
-    intro r. apply prop_ext; intro h.
-    unfold nr_dest, nr_mk. rewrite <- dest_mk.
-    apply h. intros r' [a H]. exists a. exact H.
-    intros P H. apply H. rewrite <- h. destruct (nr_mk r) as [r' [a h']].
-    exists a. unfold nr_dest, dest. simpl. exact h'.
+    intro r. apply (@finv_inv_r _ _ _ (fun r0 => (forall P : recspace A -> Prop,
+      (forall r' : recspace A, nr_pred r' -> P r') -> P r0))) ; intro H.
+    - apply H. clear r H. intros r (a,H). now exists a.
+    - destruct H as (a,<-). intros P H. apply H. now exists a.
   Qed.
 
 End non_recursive_inductive_type.
@@ -1501,7 +1495,7 @@ End non_recursive_inductive_type.
 (* Cart.tybit0 *)
 (*****************************************************************************)
 
-Definition tybit0 A := nr_type (finite_sum A A).
+Definition tybit0 A := finite_sum A A.
 
 Definition _mk_tybit0 : forall {A : Type'}, (recspace (finite_sum A A)) -> tybit0 A := fun A => nr_mk (finite_sum A A).
 
@@ -1517,7 +1511,7 @@ Proof. intro A. apply nr_dest_mk. Qed.
 (* Cart.tybit1 *)
 (*****************************************************************************)
 
-Definition tybit1 A := nr_type (finite_sum (finite_sum A A) unit).
+Definition tybit1 A := finite_sum (finite_sum A A) unit.
 
 Definition _mk_tybit1 : forall {A : Type'}, (recspace (finite_sum (finite_sum A A) unit)) -> tybit1 A := fun A => nr_mk (finite_sum (finite_sum A A) unit).
 
