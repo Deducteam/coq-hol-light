@@ -207,7 +207,6 @@ remove_empty_modules() {
         -e "/^Require Import ${root_path}\.theory_hol\.$/d" \
         -e "/^Require Import ${root_path}\.types\.$/d" \
         -e "/^Require Import ${root_path}\.axioms\.$/d" \
-        -e "/^Axiom thm_HAS_INTEGRAL_TWIZZLE_INTERVAL /d" \
         -e 's/NUMERAL //g' \
         $1
 }
