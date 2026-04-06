@@ -1,0 +1,22 @@
+Bootstrap: docker
+From: abdelghanialidra/hol2dk:0.0.9
+
+%help
+    to build a .sif image from this file use
+    sudo singularity build hol2dk.0.0.10.sif hol2dk.singularity
+    
+%environment
+    HOME=/home/opam
+
+%runscript
+    exec /bin/bash "$@"
+
+%post
+    echo "setting home directory"
+    export HOME=/home/opam
+    echo "initializing opam"
+    opam init
+    eval $(opam env)
+    apt install -y htop
+    chmod 777 $HOME
+    echo "End of build phase"
